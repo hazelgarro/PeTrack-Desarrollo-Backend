@@ -1,0 +1,6 @@
+@APIPetrack_HostAddress = http://localhost:5262
+
+GET {{APIPetrack_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
