@@ -40,8 +40,6 @@ namespace APIPetrack.Controllers
 
                 veterinarian.Password = _passwordHasher.HashPassword(veterinarian.Password);
 
-                veterinarian.UserType = 'v';
-
                 _context.Veterinarian.Add(veterinarian);
                 await _context.SaveChangesAsync();
 

@@ -31,9 +31,6 @@ namespace APIPetrack.Models
         [MaxLength(100)]
         public string ClinicName { get; set; }
 
-        [Required]
-        public char UserType { get; set; }
-
         public class LoginVeterinarian
         {
             [Required(ErrorMessage = "Blank email is not allowed")]
