@@ -1,4 +1,4 @@
-﻿using APIPetrack.Models;
+﻿using APIPetrack.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace APIPetrack.Context

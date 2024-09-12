@@ -1,6 +1,6 @@
 ﻿using APIPetrack.Context;
-using APIPetrack.Models;
 using APIPetrack.Models.Custom;
+using APIPetrack.Models.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

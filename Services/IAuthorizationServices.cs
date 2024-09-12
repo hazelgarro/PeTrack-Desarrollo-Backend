@@ -1,5 +1,5 @@
-﻿using APIPetrack.Models;
-using APIPetrack.Models.Custom;
+﻿using APIPetrack.Models.Custom;
+using APIPetrack.Models.Users;
 
 namespace APIPetrack.Services
 {

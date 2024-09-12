@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace APIPetrack.Models
+namespace APIPetrack.Models.Users
 {
     public class PetStoreShelter
     {

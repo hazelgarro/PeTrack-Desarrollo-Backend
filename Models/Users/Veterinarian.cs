@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace APIPetrack.Models
+namespace APIPetrack.Models.Users
 {
-    public class PetOwner
+    public class Veterinarian
     {
+
         [Required]
         [Key]
         public int Id { get; set; }
@@ -26,7 +27,11 @@ namespace APIPetrack.Models
         [MaxLength(255)]
         public string Password { get; set; }
 
-        public class LoginPetOwner
+        [Required]
+        [MaxLength(100)]
+        public string ClinicName { get; set; }
+
+        public class LoginVeterinarian
         {
             [Required(ErrorMessage = "Blank email is not allowed")]
             [DataType(DataType.EmailAddress)]
@@ -37,5 +42,7 @@ namespace APIPetrack.Models
             public string Password { get; set; }
         }
 
+
     }
+
 }
