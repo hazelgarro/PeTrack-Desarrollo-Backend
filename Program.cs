@@ -10,10 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-//Contexto y string de conexion
+//Context and conextion string 
 builder.Services.AddDbContext<APIPetrack.Context.DbContextPetrack>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
 
-// Configuración del servicio JWT
+// JWT
 var key = builder.Configuration.GetValue<string>("JwtSettings:Key");
 var keyBytes = Encoding.ASCII.GetBytes(key);
 
@@ -41,6 +41,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000", "https://pe-track-desarrollo-frontend.vercel.app/") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); 
+        });
+});
 
 var app = builder.Build();
 
