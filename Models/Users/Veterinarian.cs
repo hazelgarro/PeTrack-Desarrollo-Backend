@@ -21,6 +21,12 @@ namespace APIPetrack.Models.Users
         [MaxLength(255)]
         public string CoverPicture { get; set; }
 
+        [MaxLength(100)]
+        public string WorkingDays { get; set; }
+
+        [MaxLength(50)]
+        public string WorkingHours { get; set; }
+
     }
 
 }

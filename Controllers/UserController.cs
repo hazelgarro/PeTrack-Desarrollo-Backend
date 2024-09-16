@@ -46,6 +46,7 @@ namespace APIPetrack.Controllers
                     Password = _passwordHasher.HashPassword(request.Password),
                     UserTypeId = request.UserTypeId,
                     ProfilePicture = request.ProfilePicture,
+                    PhoneNumber = request.PhoneNumber
                 };
 
                 _context.AppUser.Add(user);
@@ -73,13 +74,17 @@ namespace APIPetrack.Controllers
                         var nameVeterinarian = request.AdditionalData.TryGetValue("CompleteName", out var completeNameVeterinarian);
                         var clinic = request.AdditionalData.TryGetValue("ClinicName", out var clinicName);
                         var coverPictureVet = request.AdditionalData.TryGetValue("CoverPicture", out var coverPictureVeterinarian);
+                        var workingDaysVet = request.AdditionalData.TryGetValue("WorkingDays", out var workingDaysVeterinarian);
+                        var workingHoursVet = request.AdditionalData.TryGetValue("WorkingHours", out var workingHoursVeterinarian);
 
                         var veterinarian = new Veterinarian
                         {
                             AppUserId = userCreated.Id,
                             CompleteName = completeNameVeterinarian?.ToString(),
                             ClinicName = clinicName?.ToString(),
-                            CoverPicture = coverPictureVeterinarian?.ToString()
+                            CoverPicture = coverPictureVeterinarian?.ToString(),
+                            WorkingDays = workingDaysVeterinarian?.ToString(),
+                            WorkingHours = workingHoursVeterinarian?.ToString()
                         };
 
                         _context.Veterinarian.Add(veterinarian);
@@ -90,13 +95,17 @@ namespace APIPetrack.Controllers
                         var nameStore = request.AdditionalData.TryGetValue("Name", out var namePetStore);
                         var adddress = request.AdditionalData.TryGetValue("Address", out var addressVet);
                         var coverPictureStore = request.AdditionalData.TryGetValue("CoverPicture", out var coverPicturePetStore);
+                        var workingDaysStore = request.AdditionalData.TryGetValue("WorkingDays", out var workingDaysPetStore);
+                        var workingHoursStore = request.AdditionalData.TryGetValue("WorkingHours", out var workingHoursPetStore);
 
                         var petStoreShelter = new PetStoreShelter
                         {
                             AppUserId = userCreated.Id,
                             Name = namePetStore?.ToString(),
                             Address = addressVet?.ToString(),
-                            CoverPicture = coverPicturePetStore?.ToString()
+                            CoverPicture = coverPicturePetStore?.ToString(),
+                            WorkingDays = workingDaysPetStore?.ToString(),
+                            WorkingHours = workingHoursPetStore?.ToString()
                         };
 
                         _context.PetStoreShelter.Add(petStoreShelter);
@@ -143,7 +152,9 @@ namespace APIPetrack.Controllers
                             {
                                 { "CompleteName", veterinarian.CompleteName },
                                 { "ClinicName", veterinarian.ClinicName },
-                                { "CoverPicture", veterinarian.CoverPicture }
+                                { "CoverPicture", veterinarian.CoverPicture },
+                                { "WorkingDays", veterinarian.WorkingDays },
+                                { "WorkingHours", veterinarian.WorkingHours }
                             };
                             break;
                         case 'S': // PetStoreShelter
@@ -152,7 +163,9 @@ namespace APIPetrack.Controllers
                             {
                                 { "Name", petStoreShelter.Name },
                                 { "Address", petStoreShelter.Address },
-                                { "CoverPicture", petStoreShelter.CoverPicture }
+                                { "CoverPicture", petStoreShelter.CoverPicture },
+                                { "WorkingDays", petStoreShelter.WorkingDays },
+                                { "WorkingHours", petStoreShelter.WorkingHours }
                             };
 
                             break;
@@ -168,6 +181,7 @@ namespace APIPetrack.Controllers
                         user.Id,
                         user.UserTypeId,
                         user.ProfilePicture,
+                        user.PhoneNumber,
                         details
                     };
 

@@ -23,6 +23,9 @@ namespace APIPetrack.Models.Users
         [MaxLength(255)]
         public string ProfilePicture { get; set; }
 
+        [MaxLength(15)]
+        public string PhoneNumber { get; set; }
+
         public class LoginUser
         {
             [Required(ErrorMessage = "Blank email is not allowed")]
