@@ -7,7 +7,7 @@ namespace APIPetrack.Models.Users
 
         [Required]
         [Key]
-        public int Id { get; set; }
+        public int AppUserId { get; set; }
 
         [Required]
         [MaxLength(100)]
@@ -18,25 +18,8 @@ namespace APIPetrack.Models.Users
         public string Address { get; set; }
 
         [Required]
-        [EmailAddress]
-        [MaxLength(100)]
-        public string Email { get; set; }
-
-        [Required]
-        [MinLength(8)]
         [MaxLength(255)]
-        public string Password { get; set; }
-
-        public class LoginPetStoreShelter
-        {
-            [Required(ErrorMessage = "Blank email is not allowed")]
-            [DataType(DataType.EmailAddress)]
-            public string Email { get; set; }
-
-            [Required(ErrorMessage = "You must enter your password")]
-            [DataType(DataType.Password)]
-            public string Password { get; set; }
-        }
+        public string CoverPicture { get; set; }
 
     }
 }

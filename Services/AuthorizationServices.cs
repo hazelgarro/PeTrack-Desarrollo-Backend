@@ -24,9 +24,9 @@ namespace APIPetrack.Services
             _configuration = configuration;
         }
 
-        public async Task<AuthorizationResponse> LoginPetOwnerAsync(PetOwner.LoginPetOwner loginPetOwner)
+        public async Task<AuthorizationResponse> LoginUserAsync(AppUser.LoginUser loginUser)
         {
-            var user = await _context.PetOwner.FirstOrDefaultAsync(u => u.Email == loginPetOwner.Email);
+            var user = await _context.AppUser.FirstOrDefaultAsync(u => u.Email == loginUser.Email);
 
             if (user == null)
             {
@@ -38,7 +38,7 @@ namespace APIPetrack.Services
                 };
             }
 
-            bool passwordIsValid = _passwordHasher.VerifyPassword(loginPetOwner.Password, user.Password);
+            bool passwordIsValid = _passwordHasher.VerifyPassword(loginUser.Password, user.Password);
 
             if (!passwordIsValid)
             {
@@ -59,79 +59,6 @@ namespace APIPetrack.Services
                 Message = "Ok"
             };
         }
-
-        public async Task<AuthorizationResponse> LoginPetShoreShelterAsync(PetStoreShelter.LoginPetStoreShelter loginPetStoreShelter)
-        {
-            var user = await _context.PetStoreShelter.FirstOrDefaultAsync(u => u.Email == loginPetStoreShelter.Email);
-
-            if (user == null)
-            {
-                return new AuthorizationResponse
-                {
-                    Token = null,
-                    Result = false,
-                    Message = "User not found"
-                };
-            }
-
-            bool passwordIsValid = _passwordHasher.VerifyPassword(loginPetStoreShelter.Password, user.Password);
-
-            if (!passwordIsValid)
-            {
-                return new AuthorizationResponse
-                {
-                    Token = null,
-                    Result = false,
-                    Message = "Incorrect password"
-                };
-            }
-
-            string tokenCreated = GenerateToken(user.Id);
-
-            return new AuthorizationResponse
-            {
-                Token = tokenCreated,
-                Result = true,
-                Message = "Ok"
-            };
-        }
-
-        public async Task<AuthorizationResponse> LoginVeterinarianAsync(Veterinarian.LoginVeterinarian loginVeterinarian)
-        {
-            var user = await _context.Veterinarian.FirstOrDefaultAsync(u => u.Email == loginVeterinarian.Email);
-
-            if (user == null)
-            {
-                return new AuthorizationResponse
-                {
-                    Token = null,
-                    Result = false,
-                    Message = "User not found"
-                };
-            }
-
-            bool passwordIsValid = _passwordHasher.VerifyPassword(loginVeterinarian.Password, user.Password);
-
-            if (!passwordIsValid)
-            {
-                return new AuthorizationResponse
-                {
-                    Token = null,
-                    Result = false,
-                    Message = "Incorrect password"
-                };
-            }
-
-            string tokenCreated = GenerateToken(user.Id);
-
-            return new AuthorizationResponse
-            {
-                Token = tokenCreated,
-                Result = true,
-                Message = "Ok"
-            };
-        }
-
         private string GenerateToken(int userId)
         {
             var key = _configuration.GetValue<string>("JwtSettings:Key");

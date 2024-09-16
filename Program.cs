@@ -45,13 +45,12 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
+    options.AddPolicy("AllowAnyOriginPolicy",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000", "https://pe-track-desarrollo-frontend.vercel.app/") 
+            policy.AllowAnyOrigin() 
                   .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials(); 
+                  .AllowAnyMethod();
         });
 });
 
@@ -71,7 +70,7 @@ app.UseRouting();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowReactApp");
+app.UseCors("AllowAnyOriginPolicy");
 
 app.UseAuthentication();
 

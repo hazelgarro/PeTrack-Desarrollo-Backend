@@ -7,6 +7,7 @@ namespace APIPetrack.Context
     {
         public DbContextPetrack(DbContextOptions<DbContextPetrack> options) : base(options) { }
 
+        public DbSet<AppUser> AppUser { get; set; }
         public DbSet<PetOwner> PetOwner { get; set; }
         public DbSet<PetStoreShelter> PetStoreShelter { get; set; }
         public DbSet<Veterinarian> Veterinarian { get; set; }
