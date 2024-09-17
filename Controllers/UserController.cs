@@ -71,8 +71,7 @@ namespace APIPetrack.Controllers
 
                     case 'V': // Veterinarian
 
-                        var nameVeterinarian = request.AdditionalData.TryGetValue("CompleteName", out var completeNameVeterinarian);
-                        var clinic = request.AdditionalData.TryGetValue("ClinicName", out var clinicName);
+                        var clinic = request.AdditionalData.TryGetValue("Name", out var NameVet);
                         var adddress = request.AdditionalData.TryGetValue("Address", out var addressVet);
                         var coverPictureVet = request.AdditionalData.TryGetValue("CoverPicture", out var coverPictureVeterinarian);
                         var workingDaysVet = request.AdditionalData.TryGetValue("WorkingDays", out var workingDaysVeterinarian);
@@ -81,8 +80,7 @@ namespace APIPetrack.Controllers
                         var veterinarian = new Veterinarian
                         {
                             AppUserId = userCreated.Id,
-                            CompleteName = completeNameVeterinarian?.ToString(),
-                            ClinicName = clinicName?.ToString(),
+                            Name = NameVet?.ToString(),
                             Address = addressVet?.ToString(),
                             CoverPicture = coverPictureVeterinarian?.ToString(),
                             WorkingDays = workingDaysVeterinarian?.ToString(),
@@ -152,8 +150,7 @@ namespace APIPetrack.Controllers
                             var veterinarian = SearchVeterinarian(user.Id);
                             details = new Dictionary<string, object>
                             {
-                                { "CompleteName", veterinarian.CompleteName },
-                                { "ClinicName", veterinarian.ClinicName },
+                                { "Name", veterinarian.Name },
                                 { "Address", veterinarian.Address },
                                 { "CoverPicture", veterinarian.CoverPicture },
                                 { "WorkingDays", veterinarian.WorkingDays },
