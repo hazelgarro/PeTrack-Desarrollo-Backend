@@ -26,5 +26,8 @@ namespace APIPetrack.Models.Users
         [MaxLength(50)]
         public string WorkingHours { get; set; }
 
+        public AppUser AppUser { get; set; }
+
+        public ICollection<Pet> Pets { get; set; }
     }
 }

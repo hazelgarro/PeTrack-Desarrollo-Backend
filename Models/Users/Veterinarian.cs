@@ -26,6 +26,8 @@ namespace APIPetrack.Models.Users
         [MaxLength(50)]
         public string WorkingHours { get; set; }
 
+        public AppUser AppUser { get; set; }
+
     }
 
 }

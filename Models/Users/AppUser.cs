@@ -36,5 +36,9 @@ namespace APIPetrack.Models.Users
             [DataType(DataType.Password)]
             public string Password { get; set; }
         }
+
+        public PetOwner PetOwner { get; set; }
+        public Veterinarian Veterinarian { get; set; }
+        public PetStoreShelter PetStoreShelter { get; set; }
     }
 }
