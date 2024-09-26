@@ -257,6 +257,41 @@ namespace APIPetrack.Controllers
             }
         }
 
+        [HttpGet("SearchById/{id}")]
+        public async Task<IActionResult> SearchById(int id)
+        {
+            try
+            {
+                var pet = await _context.Pet
+                    .Where(p => p.Id == id)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.DateOfBirth,
+                        p.Species,
+                        p.OwnerId,
+                        OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : "PetStoreShelter",
+                        p.HealthIssues,
+                        p.PetPicture
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (pet == null)
+                {
+                    return NotFound(new { message = "Pet not found." });
+                }
+
+                return Ok(pet);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the pet.", details = ex.Message });
+            }
+        }
+
+
+
 
     }
 }
