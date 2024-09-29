@@ -66,11 +66,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseRouting();
+app.UseCors("AllowAnyOriginPolicy");
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAnyOriginPolicy");
+app.UseRouting();
 
 app.UseAuthentication();
 
