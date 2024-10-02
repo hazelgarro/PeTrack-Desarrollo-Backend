@@ -1,5 +1,6 @@
 ﻿using APIPetrack.Models.Users;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace APIPetrack.Models
 {
@@ -19,6 +20,20 @@ namespace APIPetrack.Models
         [Required]
         [MaxLength(50)]
         public string Species { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string Breed { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string Gender { get; set; }
+
+        [MaxLength(50)]
+        public string Weight { get; set; }
+
+        [MaxLength(50)]
+        public string Location { get; set; }
 
         [Required]
         public int OwnerId { get; set; }

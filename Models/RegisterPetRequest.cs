@@ -14,6 +14,16 @@ namespace APIPetrack.Models
         public string Species { get; set; }
 
         [Required]
+        public string Breed { get; set; }
+
+        [Required]
+        public string Gender { get; set; }
+
+        public string Weight { get; set; }
+
+        public string Location { get; set; }
+
+        [Required]
         public int OwnerId { get; set; }
 
         [Required]

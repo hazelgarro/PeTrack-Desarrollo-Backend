@@ -4,6 +4,7 @@ using APIPetrack.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace APIPetrack.Controllers
 {
@@ -53,6 +54,10 @@ namespace APIPetrack.Controllers
                 Name = request.Name,
                 DateOfBirth = request.DateOfBirth,
                 Species = request.Species,
+                Breed = request.Breed,
+                Gender = request.Gender,
+                Weight = request.Weight,
+                Location = request.Location,
                 OwnerId = request.OwnerId,
                 OwnerTypeId = request.OwnerType,
                 HealthIssues = request.HealthIssues,
@@ -90,6 +95,10 @@ namespace APIPetrack.Controllers
                         p.Name,
                         p.DateOfBirth,
                         p.Species,
+                        p.Breed,
+                        p.Gender,
+                        p.Weight,
+                        p.Location,
                         p.OwnerId,
                         OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : p.OwnerTypeId == "S" ? "PetStoreShelter" : "Veterinarian",
                         p.HealthIssues,
@@ -145,6 +154,10 @@ namespace APIPetrack.Controllers
                         p.Name,
                         p.DateOfBirth,
                         p.Species,
+                        p.Breed,
+                        p.Gender,
+                        p.Weight,
+                        p.Location,
                         p.OwnerId,
                         OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : "PetStoreShelter",
                         p.HealthIssues,
@@ -206,6 +219,10 @@ namespace APIPetrack.Controllers
             pet.Name = request.Name;
             pet.DateOfBirth = request.DateOfBirth;
             pet.Species = request.Species;
+            pet.Breed = request.Breed;
+            pet.Gender = request.Gender;
+            pet.Weight = request.Weight;
+            pet.Location = request.Location;
             pet.OwnerId = request.OwnerId;
             pet.OwnerTypeId = request.OwnerType;
             pet.HealthIssues = request.HealthIssues;
@@ -270,6 +287,10 @@ namespace APIPetrack.Controllers
                         p.Name,
                         p.DateOfBirth,
                         p.Species,
+                        p.Breed,
+                        p.Gender,
+                        p.Weight,
+                        p.Location,
                         p.OwnerId,
                         OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : "PetStoreShelter",
                         p.HealthIssues,
