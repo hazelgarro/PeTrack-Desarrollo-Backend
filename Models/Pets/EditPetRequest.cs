@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace APIPetrack.Models
+namespace APIPetrack.Models.Pets
 {
-    public class RegisterPetRequest
+    public class EditPetRequest
     {
         [Required]
         public string Name { get; set; }
 
         [Required]
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
 
         [Required]
         public string Species { get; set; }
@@ -22,12 +22,6 @@ namespace APIPetrack.Models
         public string Weight { get; set; }
 
         public string Location { get; set; }
-
-        [Required]
-        public int OwnerId { get; set; }
-
-        [Required]
-        public string OwnerType { get; set; }  // 'PetOwner' o 'PetStoreShelter'
 
         public string HealthIssues { get; set; }
 

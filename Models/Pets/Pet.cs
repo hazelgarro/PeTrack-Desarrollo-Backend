@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace APIPetrack.Models
+namespace APIPetrack.Models.Pets
 {
     public class Pet
     {
@@ -15,7 +15,7 @@ namespace APIPetrack.Models
         public string Name { get; set; }
 
         [Required]
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
 
         [Required]
         [MaxLength(50)]
@@ -47,7 +47,7 @@ namespace APIPetrack.Models
         public string PetPicture { get; set; }
 
 
-        public PetOwner? PetOwner { get; set; }
-        public PetStoreShelter? PetStoreShelter { get; set; }
+        public PetOwner PetOwner { get; set; }
+        public PetStoreShelter PetStoreShelter { get; set; }
     }
 }

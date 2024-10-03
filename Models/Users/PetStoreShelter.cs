@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using APIPetrack.Models.Pets;
 
 namespace APIPetrack.Models.Users
 {

@@ -1,10 +1,10 @@
 ﻿using APIPetrack.Context;
 using APIPetrack.Models.Users;
-using APIPetrack.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using APIPetrack.Models.Pets;
 
 namespace APIPetrack.Controllers
 {
@@ -180,7 +180,7 @@ namespace APIPetrack.Controllers
 
         [Authorize]
         [HttpPut("EditPet/{petId}")]
-        public async Task<IActionResult> EditPet(int petId, [FromBody] RegisterPetRequest request)
+        public async Task<IActionResult> EditPet(int petId, [FromBody] EditPetRequest request)
         {
             if (request == null)
             {
@@ -192,30 +192,12 @@ namespace APIPetrack.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Buscar la mascota que se va a editar
             var pet = await _context.Pet.FindAsync(petId);
             if (pet == null)
             {
                 return NotFound(new { message = "Pet not found." });
             }
 
-            // Validar el propietario según el tipo (PetOwner o PetStoreShelter)
-            object owner = null;
-            if (request.OwnerType == "O")
-            {
-                owner = await _context.PetOwner.FindAsync(request.OwnerId);
-            }
-            else if (request.OwnerType == "S")
-            {
-                owner = await _context.PetStoreShelter.FindAsync(request.OwnerId);
-            }
-
-            if (owner == null)
-            {
-                return BadRequest(new { message = $"{(request.OwnerType == "O" ? "Pet owner" : "Pet store shelter")} not found." });
-            }
-
-            // Actualizar los datos de la mascota
             pet.Name = request.Name;
             pet.DateOfBirth = request.DateOfBirth;
             pet.Species = request.Species;
@@ -223,12 +205,8 @@ namespace APIPetrack.Controllers
             pet.Gender = request.Gender;
             pet.Weight = request.Weight;
             pet.Location = request.Location;
-            pet.OwnerId = request.OwnerId;
-            pet.OwnerTypeId = request.OwnerType;
             pet.HealthIssues = request.HealthIssues;
             pet.PetPicture = request.PetPicture;
-            pet.PetOwner = request.OwnerType == "O" ? owner as PetOwner : null;
-            pet.PetStoreShelter = request.OwnerType == "S" ? owner as PetStoreShelter : null;
 
             try
             {
