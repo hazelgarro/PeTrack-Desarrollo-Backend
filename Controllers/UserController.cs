@@ -31,7 +31,12 @@ namespace APIPetrack.Controllers
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Invalid model state.",
+                    Data = ModelState
+                });
             }
 
             try
@@ -39,7 +44,12 @@ namespace APIPetrack.Controllers
 
                 if (_context.AppUser.Any(po => po.Email == request.Email))
                 {
-                    return Conflict(new { message = "Email already in use." });
+                    return Conflict(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Email already in use.",
+                        Data = null
+                    });
                 }
 
                 var user = new AppUser
@@ -48,7 +58,8 @@ namespace APIPetrack.Controllers
                     Password = _passwordHasher.HashPassword(request.Password),
                     UserTypeId = request.UserTypeId,
                     ProfilePicture = request.ProfilePicture,
-                    PhoneNumber = request.PhoneNumber
+                    PhoneNumber = request.PhoneNumber,
+                    ImagePublicId = request.ImagePublicId,
                 };
 
                 _context.AppUser.Add(user);
@@ -78,6 +89,7 @@ namespace APIPetrack.Controllers
                         var coverPictureVet = request.AdditionalData.TryGetValue("CoverPicture", out var coverPictureVeterinarian);
                         var workingDaysVet = request.AdditionalData.TryGetValue("WorkingDays", out var workingDaysVeterinarian);
                         var workingHoursVet = request.AdditionalData.TryGetValue("WorkingHours", out var workingHoursVeterinarian);
+                        var imagePublicCoverV = request.AdditionalData.TryGetValue("ImagePublicIdCover", out var imagePublicIdCoverVet);
 
                         var veterinarian = new Veterinarian
                         {
@@ -86,7 +98,8 @@ namespace APIPetrack.Controllers
                             Address = addressVet?.ToString(),
                             CoverPicture = coverPictureVeterinarian?.ToString(),
                             WorkingDays = workingDaysVeterinarian?.ToString(),
-                            WorkingHours = workingHoursVeterinarian?.ToString()
+                            WorkingHours = workingHoursVeterinarian?.ToString(),
+                            ImagePublicIdCover = imagePublicIdCoverVet?.ToString(),
                         };
 
                         _context.Veterinarian.Add(veterinarian);
@@ -99,6 +112,7 @@ namespace APIPetrack.Controllers
                         var coverPictureStore = request.AdditionalData.TryGetValue("CoverPicture", out var coverPicturePetStore);
                         var workingDaysStore = request.AdditionalData.TryGetValue("WorkingDays", out var workingDaysPetStore);
                         var workingHoursStore = request.AdditionalData.TryGetValue("WorkingHours", out var workingHoursPetStore);
+                        var imagePublicCoverStore = request.AdditionalData.TryGetValue("ImagePublicIdCover", out var imagePublicIdCoverStoreShelter);
 
                         var petStoreShelter = new PetStoreShelter
                         {
@@ -107,22 +121,38 @@ namespace APIPetrack.Controllers
                             Address = addressStoreShelter?.ToString(),
                             CoverPicture = coverPicturePetStore?.ToString(),
                             WorkingDays = workingDaysPetStore?.ToString(),
-                            WorkingHours = workingHoursPetStore?.ToString()
+                            WorkingHours = workingHoursPetStore?.ToString(),
+                            ImagePublicIdCover = imagePublicIdCoverStoreShelter?.ToString(),
                         };
 
                         _context.PetStoreShelter.Add(petStoreShelter);
                         break;
 
                     default:
-                        return BadRequest("Invalid UserTypeId.");
+                        return BadRequest(new ApiResponse<object>
+                        {
+                            Result = false,
+                            Message = "Invalid UserTypeId.",
+                            Data = null
+                        });
                 }
 
                 _context.SaveChanges();
-                return Ok(new { message = "Account created successfully." });
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Account created successfully.",
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while creating the account.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while creating the account.",
+                    Data = ex.Message
+                });
             }
         }
 
@@ -155,6 +185,7 @@ namespace APIPetrack.Controllers
                                 { "Name", veterinarian.Name },
                                 { "Address", veterinarian.Address },
                                 { "CoverPicture", veterinarian.CoverPicture },
+                                { "ImagePublicIdCover", veterinarian.ImagePublicIdCover },
                                 { "WorkingDays", veterinarian.WorkingDays },
                                 { "WorkingHours", veterinarian.WorkingHours }
                             };
@@ -166,6 +197,7 @@ namespace APIPetrack.Controllers
                                 { "Name", petStoreShelter.Name },
                                 { "Address", petStoreShelter.Address },
                                 { "CoverPicture", petStoreShelter.CoverPicture },
+                                { "ImagePublicIdCover", petStoreShelter.ImagePublicIdCover },
                                 { "WorkingDays", petStoreShelter.WorkingDays },
                                 { "WorkingHours", petStoreShelter.WorkingHours }
                             };
@@ -173,7 +205,12 @@ namespace APIPetrack.Controllers
                             break;
 
                         default:
-                            return BadRequest("Invalid UserTypeId.");
+                            return BadRequest(new ApiResponse<object>
+                            {
+                                Result = false,
+                                Message = "Invalid UserTypeId.",
+                                Data = null
+                            });
                     }
 
                     var result = new
@@ -183,18 +220,34 @@ namespace APIPetrack.Controllers
                         user.Id,
                         user.UserTypeId,
                         user.ProfilePicture,
+                        user.ImagePublicId,
                         user.PhoneNumber,
                         details
                     };
 
-                    return Ok(result);
+                    return Ok(new ApiResponse<object>
+                    {
+                        Result = true,
+                        Message = "Login successful.",
+                        Data = result
+                    });
                 }
 
-                return Unauthorized(new { message = "Invalid login credentials." });
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Invalid login credentials.",
+                    Data = null
+                });
             }
             else
             {
-                return Unauthorized(response);
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Login failed.",
+                    Data = response
+                });
             }
         }
 
@@ -204,7 +257,12 @@ namespace APIPetrack.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Invalid input data.",
+                    Data = ModelState
+                });
             }
 
             try
@@ -213,14 +271,24 @@ namespace APIPetrack.Controllers
 
                 if (user == null)
                 {
-                    return NotFound(new { message = "User not found." });
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "User not found.",
+                        Data = null
+                    });
                 }
 
                 var passwordVerificationResult = _passwordHasher.VerifyPassword(model.CurrentPassword, user.Password);
 
                 if (!passwordVerificationResult)
                 {
-                    return Unauthorized(new { message = "Incorrect current password." });
+                    return Unauthorized(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Incorrect current password.",
+                        Data = null
+                    });
                 }
 
                 user.Password = _passwordHasher.HashPassword(model.NewPassword);
@@ -228,11 +296,21 @@ namespace APIPetrack.Controllers
                 _context.AppUser.Update(user);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { message = "Password updated successfully." });
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Password updated successfully.",
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while updating the password.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while updating the password.",
+                    Data = ex.Message
+                });
             }
         }
 
@@ -243,7 +321,12 @@ namespace APIPetrack.Controllers
 
             if (user == null)
             {
-                return NotFound("User not found.");
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "User not found.",
+                    Data = null
+                });
             }
 
             Dictionary<string, object> details = new Dictionary<string, object>{
@@ -251,6 +334,7 @@ namespace APIPetrack.Controllers
                 { "Id", user.Id },
                 { "Email", user.Email },
                 { "ProfilePicture", user.ProfilePicture },
+                { "ImagePublicId", user.ImagePublicId },
                 { "UserTypeId", user.UserTypeId },
                 { "PhoneNumber", user.PhoneNumber }
             };
@@ -273,6 +357,7 @@ namespace APIPetrack.Controllers
                         details.Add("UserType", "Veterinarian");
                         details.Add("Name", veterinarian.Name);
                         details.Add("CoverPicture", veterinarian.CoverPicture);
+                        details.Add("ImagePublicIdCover", veterinarian.ImagePublicIdCover);
                         details.Add("Address", veterinarian.Address);
                         details.Add("WorkingDays", veterinarian.WorkingDays);
                         details.Add("WorkingHours", veterinarian.WorkingHours);
@@ -287,16 +372,27 @@ namespace APIPetrack.Controllers
                         details.Add("Name", petStoreShelter.Name);
                         details.Add("Address", petStoreShelter.Address);
                         details.Add("CoverPicture", petStoreShelter.CoverPicture);
+                        details.Add("ImagePublicIdCover", petStoreShelter.ImagePublicIdCover);
                         details.Add("WorkingDays", petStoreShelter.WorkingDays);
                         details.Add("WorkingHours", petStoreShelter.WorkingHours);
                     }
                     break;
 
                 default:
-                    return BadRequest("Invalid UserTypeId.");
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Invalid UserTypeId.",
+                        Data = null
+                    });
             }
 
-            return Ok(details);
+            return Ok(new ApiResponse<Dictionary<string, object>>
+            {
+                Result = true,
+                Message = "User details retrieved successfully.",
+                Data = details
+            });
         }
 
         [HttpGet("ListVeterinarians")]
@@ -306,7 +402,12 @@ namespace APIPetrack.Controllers
 
             if (veterinarianUsers == null || veterinarianUsers.Count == 0)
             {
-                return NotFound("No veterinarians found.");
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "No veterinarians found.",
+                    Data = null
+                });
             }
 
             var veterinarianDetailsList = new List<Dictionary<string, object>>();
@@ -323,6 +424,7 @@ namespace APIPetrack.Controllers
                         { "Name", veterinarian.Name },
                         { "ProfilePicture", user.ProfilePicture },
                         { "CoverPicture", veterinarian.CoverPicture },
+                        { "ImagePublicIdCover", veterinarian.ImagePublicIdCover },
                         { "PhoneNumber", user.PhoneNumber },
                         { "WorkingDays", veterinarian.WorkingDays },
                         { "WorkingHours", veterinarian.WorkingHours }
@@ -332,7 +434,12 @@ namespace APIPetrack.Controllers
                 }
             }
 
-            return Ok(veterinarianDetailsList);
+            return Ok(new ApiResponse<List<Dictionary<string, object>>>
+            {
+                Result = true,
+                Message = "Veterinarians retrieved successfully.",
+                Data = veterinarianDetailsList
+            });
 
         }
 
@@ -343,7 +450,12 @@ namespace APIPetrack.Controllers
 
             if (petStoreShelterUsers == null || petStoreShelterUsers.Count == 0)
             {
-                return NotFound("No pet store shelters found.");
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "No pet store shelters found.",
+                    Data = null
+                });
             }
 
             var petStoreShelterDetailsList = new List<Dictionary<string, object>>();
@@ -362,6 +474,7 @@ namespace APIPetrack.Controllers
                         { "Address", petStoreShelter.Address },
                         { "PhoneNumber", user.PhoneNumber },
                         { "CoverPicture", petStoreShelter.CoverPicture },
+                        { "ImagePublicIdCover", petStoreShelter.ImagePublicIdCover },
                         { "WorkingDays", petStoreShelter.WorkingDays },
                         { "WorkingHours", petStoreShelter.WorkingHours }
                     };
@@ -370,7 +483,12 @@ namespace APIPetrack.Controllers
                 }
             }
 
-            return Ok(petStoreShelterDetailsList);
+            return Ok(new ApiResponse<List<Dictionary<string, object>>>
+            {
+                Result = true,
+                Message = "Pet store shelters retrieved successfully.",
+                Data = petStoreShelterDetailsList
+            });
 
         }
 
@@ -382,18 +500,29 @@ namespace APIPetrack.Controllers
 
             if (user == null)
             {
-                return NotFound("User not found.");
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "User not found.",
+                    Data = null
+                });
             }
 
             var existingEmail = await _context.AppUser.FirstOrDefaultAsync(u => u.Email == updatedUser.Email && u.Id != id);
             if (existingEmail != null)
             {
-                return BadRequest("Email already in use by another user.");
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Email already in use by another user.",
+                    Data = null
+                });
             }
 
             user.Email = updatedUser.Email;
             user.ProfilePicture = updatedUser.ProfilePicture;
             user.PhoneNumber = updatedUser.PhoneNumber;
+            user.ImagePublicId = updatedUser.ImagePublicId;
 
             switch (user.UserTypeId)
             {
@@ -412,6 +541,7 @@ namespace APIPetrack.Controllers
                         veterinarian.Name = updatedUser.Name;
                         veterinarian.Address = updatedUser.Address;
                         veterinarian.CoverPicture = updatedUser.CoverPicture;
+                        veterinarian.ImagePublicIdCover = updatedUser.ImagePublicIdCover;
                         veterinarian.WorkingDays = updatedUser.WorkingDays;
                         veterinarian.WorkingHours = updatedUser.WorkingHours;
                     }
@@ -424,21 +554,32 @@ namespace APIPetrack.Controllers
                         petStoreShelter.Name = updatedUser.Name;
                         petStoreShelter.Address = updatedUser.Address;
                         petStoreShelter.CoverPicture = updatedUser.CoverPicture;
+                        petStoreShelter.ImagePublicIdCover = updatedUser.ImagePublicIdCover;
                         petStoreShelter.WorkingDays = updatedUser.WorkingDays;
                         petStoreShelter.WorkingHours = updatedUser.WorkingHours;
                     }
                     break;
 
                 default:
-                    return BadRequest("Invalid UserTypeId.");
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Invalid UserTypeId.",
+                        Data = null
+                    });
             }
 
             await _context.SaveChangesAsync();
 
-            return Ok("User and type specific details updated successfully.");
+            return Ok(new ApiResponse<object>
+            {
+                Result = true,
+                Message = "User and type-specific details updated successfully.",
+                Data = null
+            });
         }
 
-        [Authorize]
+       // [Authorize]
         [HttpDelete("DeleteAccount/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -452,17 +593,32 @@ namespace APIPetrack.Controllers
 
                 if (user == null)
                 {
-                    return NotFound();
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "User not found.",
+                        Data = null
+                    });
                 }
 
                 _context.AppUser.Remove(user);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { message = "User deleted successfully." });
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "User deleted successfully.",
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while deleting the user.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while deleting the user.",
+                    Data = new { details = ex.Message }
+                });
             }
         }
 

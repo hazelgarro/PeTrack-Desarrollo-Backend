@@ -16,6 +16,9 @@ namespace APIPetrack.Models.Users
         [MaxLength(255)]
         public string CoverPicture { get; set; }
 
+        [MaxLength(255)]
+        public string ImagePublicIdCover { get; set; }
+
         [Required]
         [MaxLength(255)]
         public string Address { get; set; }

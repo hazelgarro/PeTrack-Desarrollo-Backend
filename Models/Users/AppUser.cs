@@ -23,6 +23,9 @@ namespace APIPetrack.Models.Users
         [MaxLength(255)]
         public string ProfilePicture { get; set; }
 
+        [MaxLength(255)]
+        public string ImagePublicId { get; set; }
+
         [MaxLength(15)]
         public string PhoneNumber { get; set; }
 

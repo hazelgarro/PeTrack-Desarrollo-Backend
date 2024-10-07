@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using APIPetrack.Models.Pets;
+using APIPetrack.Models.Custom;
 
 namespace APIPetrack.Controllers
 {
@@ -26,12 +27,22 @@ namespace APIPetrack.Controllers
         {
             if (request == null)
             {
-                return BadRequest(new { message = "Request cannot be null." });
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Request cannot be null.",
+                    Data = null
+                });
             }
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Invalid request.",
+                    Data = ModelState
+                });
             }
 
             object owner = null;
@@ -46,7 +57,12 @@ namespace APIPetrack.Controllers
 
             if (owner == null)
             {
-                return BadRequest(new { message = $"{(request.OwnerType == "O" ? "Pet owner" : "Pet store shelter")} not found." });
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = $"{(request.OwnerType == "O" ? "Pet owner" : "Pet store shelter")} not found.",
+                    Data = null
+                });
             }
 
             var pet = new Pet
@@ -62,6 +78,7 @@ namespace APIPetrack.Controllers
                 OwnerTypeId = request.OwnerType,
                 HealthIssues = request.HealthIssues,
                 PetPicture = request.PetPicture,
+                ImagePublicId = request.ImagePublicId,
                 PetOwner = request.OwnerType == "O" ? owner as PetOwner : null,
                 PetStoreShelter = request.OwnerType == "S" ? owner as PetStoreShelter : null
             };
@@ -71,15 +88,31 @@ namespace APIPetrack.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(new { message = "Pet registered successfully.", petId = pet.Id, petName = pet.Name });
+
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pet registered successfully.",
+                    Data = new { petId = pet.Id, petName = pet.Name }
+                });
             }
             catch (DbUpdateException dbEx)
             {
-                return StatusCode(500, new { message = "Database error occurred while registering the pet.", details = dbEx.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Database error occurred while registering the pet.",
+                    Data = new { details = dbEx.Message }
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An unexpected error occurred.",
+                    Data = new { details = ex.Message }
+                });
             }
         }
 
@@ -102,20 +135,36 @@ namespace APIPetrack.Controllers
                         p.OwnerId,
                         OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : p.OwnerTypeId == "S" ? "PetStoreShelter" : "Veterinarian",
                         p.HealthIssues,
-                        p.PetPicture
+                        p.PetPicture,
+                        p.ImagePublicId
                     })
                     .ToListAsync();
 
                 if (pets == null || !pets.Any())
                 {
-                    return NotFound(new { message = "No pets found." });
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "No pets found.",
+                        Data = null
+                    });
                 }
 
-                return Ok(pets);
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pets retrieved successfully.",
+                    Data = pets
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving pets.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving pets.",
+                    Data = new { details = ex.Message }
+                });
             }
         }
 
@@ -143,7 +192,12 @@ namespace APIPetrack.Controllers
 
                 if (string.IsNullOrEmpty(ownerType))
                 {
-                    return NotFound(new { message = "Owner not found." });
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Owner not found.",
+                        Data = null
+                    });
                 }
 
                 var pets = await _context.Pet
@@ -161,20 +215,36 @@ namespace APIPetrack.Controllers
                         p.OwnerId,
                         OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : "PetStoreShelter",
                         p.HealthIssues,
-                        p.PetPicture
+                        p.PetPicture,
+                        p.ImagePublicId
                     })
                     .ToListAsync();
 
                 if (pets == null || !pets.Any())
                 {
-                    return NotFound(new { message = "No pets found for the given owner." });
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "No pets found for the given owner.",
+                        Data = null
+                    });
                 }
 
-                return Ok(pets);
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pets retrieved successfully.",
+                    Data = pets
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving pets.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving pets.",
+                    Data = new { details = ex.Message }
+                });
             }
         }
 
@@ -184,18 +254,33 @@ namespace APIPetrack.Controllers
         {
             if (request == null)
             {
-                return BadRequest(new { message = "Request cannot be null." });
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Request cannot be null.",
+                    Data = null
+                });
             }
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Invalid model state.",
+                    Data = ModelState
+                });
             }
 
             var pet = await _context.Pet.FindAsync(petId);
             if (pet == null)
             {
-                return NotFound(new { message = "Pet not found." });
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Pet not found.",
+                    Data = null
+                });
             }
 
             pet.Name = request.Name;
@@ -207,19 +292,35 @@ namespace APIPetrack.Controllers
             pet.Location = request.Location;
             pet.HealthIssues = request.HealthIssues;
             pet.PetPicture = request.PetPicture;
+            pet.ImagePublicId = request.ImagePublicId;
 
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(new { message = "Pet updated successfully.", petId = pet.Id, petName = pet.Name });
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pet updated successfully.",
+                    Data = new { petId = pet.Id, petName = pet.Name }
+                });
             }
             catch (DbUpdateException dbEx)
             {
-                return StatusCode(500, new { message = "Database error occurred while updating the pet.", details = dbEx.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Database error occurred while updating the pet.",
+                    Data = new { details = dbEx.Message }
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An unexpected error occurred.",
+                    Data = new { details = ex.Message }
+                });
             }
         }
 
@@ -233,22 +334,42 @@ namespace APIPetrack.Controllers
                 var pet = await _context.Pet.FindAsync(petId);
                 if (pet == null)
                 {
-                    return NotFound(new { message = "Pet not found." });
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Pet not found.",
+                        Data = null
+                    });
                 }
 
                 // Eliminar la mascota
                 _context.Pet.Remove(pet);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { message = "Pet deleted successfully.", petId = petId });
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pet deleted successfully.",
+                    Data = new { petId = petId }
+                });
             }
             catch (DbUpdateException dbEx)
             {
-                return StatusCode(500, new { message = "Database error occurred while deleting the pet.", details = dbEx.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Database error occurred while deleting the pet.",
+                    Data = new { details = dbEx.Message }
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An unexpected error occurred.",
+                    Data = new { details = ex.Message }
+                });
             }
         }
 
@@ -272,20 +393,36 @@ namespace APIPetrack.Controllers
                         p.OwnerId,
                         OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : "PetStoreShelter",
                         p.HealthIssues,
-                        p.PetPicture
+                        p.PetPicture,
+                        p.ImagePublicId
                     })
                     .FirstOrDefaultAsync();
 
                 if (pet == null)
                 {
-                    return NotFound(new { message = "Pet not found." });
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Pet not found.",
+                        Data = null
+                    });
                 }
 
-                return Ok(pet);
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pet retrieved successfully.",
+                    Data = pet
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving the pet.", details = ex.Message });
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving the pet.",
+                    Data = new { details = ex.Message }
+                });
             }
         }
 

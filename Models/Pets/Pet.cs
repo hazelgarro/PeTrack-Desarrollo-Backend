@@ -46,7 +46,7 @@ namespace APIPetrack.Models.Pets
         [MaxLength(255)]
         public string PetPicture { get; set; }
 
-
+        public string ImagePublicId { get; set; }
         public PetOwner PetOwner { get; set; }
         public PetStoreShelter PetStoreShelter { get; set; }
     }

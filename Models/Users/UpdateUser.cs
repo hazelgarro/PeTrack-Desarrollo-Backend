@@ -7,6 +7,8 @@
         public string PhoneNumber { get; set; }
         public string CompleteName { get; set; }
         public string CoverPicture { get; set; }
+        public string ImagePublicId { get; set; }
+        public string ImagePublicIdCover { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string WorkingDays { get; set; }

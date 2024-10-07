@@ -32,5 +32,7 @@ namespace APIPetrack.Models.Pets
         public string HealthIssues { get; set; }
 
         public string PetPicture { get; set; }
+
+        public string ImagePublicId { get; set; }
     }
 }
