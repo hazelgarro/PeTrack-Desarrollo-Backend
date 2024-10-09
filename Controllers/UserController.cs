@@ -215,7 +215,6 @@ namespace APIPetrack.Controllers
 
                     var result = new
                     {
-                        response.Result,
                         response.Token,
                         user.Id,
                         user.UserTypeId,
