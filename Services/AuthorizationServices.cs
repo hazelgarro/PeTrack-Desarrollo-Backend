@@ -84,5 +84,54 @@ namespace APIPetrack.Services
 
             return tokenHandler.WriteToken(token);
         }
+
+        public ClaimsPrincipal ValidateToken(string token)
+        {
+            var key = _configuration.GetValue<string>("JwtSettings:Key");
+            var keyBytes = Encoding.ASCII.GetBytes(key);
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+                    ValidateIssuer = false, 
+                    ValidateAudience = false, 
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero 
+                };
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+                if (validatedToken is JwtSecurityToken jwtToken &&
+                    jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return principal;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid token algorithm.");
+                    return null;
+                }
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                Console.WriteLine("Token has expired.");
+                return null;
+            }
+            catch (SecurityTokenException ex)
+            {
+                Console.WriteLine($"Token validation failed: {ex.Message}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An unexpected error occurred: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

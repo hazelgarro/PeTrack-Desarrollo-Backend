@@ -1,10 +1,12 @@
 ﻿using APIPetrack.Context;
+using APIPetrack.Models;
 using APIPetrack.Models.Custom;
 using APIPetrack.Models.Users;
 using APIPetrack.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace APIPetrack.Controllers
 {
@@ -248,6 +250,108 @@ namespace APIPetrack.Controllers
                     Data = response
                 });
             }
+        }
+
+        [HttpPost("VerifyLogin")]
+        public IActionResult VerifyLogin([FromBody] TokenRequest tokenRequest)
+        {
+            var principal = _authorizationService.ValidateToken(tokenRequest.Token);
+
+            if (principal == null)
+            {
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "The user is not logged in",
+                    Data = null
+                });
+            }
+
+            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "User ID not found in token",
+                    Data = null
+                });
+            }
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var user = _context.AppUser.FirstOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "User not found",
+                    Data = null
+                });
+            }
+
+            Dictionary<string, object> details = null;
+
+            switch (user.UserTypeId)
+            {
+                case 'O': // PetOwner
+                    var petOwner = SearchPetOwner(user.Id);
+                    details = new Dictionary<string, object>
+            {
+                { "CompleteName", petOwner.CompleteName }
+            };
+                    break;
+                case 'V': // Veterinarian
+                    var veterinarian = SearchVeterinarian(user.Id);
+                    details = new Dictionary<string, object>
+            {
+                { "Name", veterinarian.Name },
+                { "Address", veterinarian.Address },
+                { "CoverPicture", veterinarian.CoverPicture },
+                { "ImagePublicIdCover", veterinarian.ImagePublicIdCover },
+                { "WorkingDays", veterinarian.WorkingDays },
+                { "WorkingHours", veterinarian.WorkingHours }
+            };
+                    break;
+                case 'S': // PetStoreShelter
+                    var petStoreShelter = SearchPetStoreShelter(user.Id);
+                    details = new Dictionary<string, object>
+            {
+                { "Name", petStoreShelter.Name },
+                { "Address", petStoreShelter.Address },
+                { "CoverPicture", petStoreShelter.CoverPicture },
+                { "ImagePublicIdCover", petStoreShelter.ImagePublicIdCover },
+                { "WorkingDays", petStoreShelter.WorkingDays },
+                { "WorkingHours", petStoreShelter.WorkingHours }
+            };
+                    break;
+                default:
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Invalid UserTypeId.",
+                        Data = null
+                    });
+            }
+
+            var result = new
+            {
+                user.Id,
+                user.UserTypeId,
+                user.ProfilePicture,
+                user.ImagePublicId,
+                user.PhoneNumber,
+                details
+            };
+
+            return Ok(new ApiResponse<object>
+            {
+                Result = true,
+                Message = "The user is logged in",
+                Data = result
+            });
         }
 
         [Authorize]
