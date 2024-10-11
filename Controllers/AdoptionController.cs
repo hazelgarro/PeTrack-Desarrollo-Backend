@@ -17,6 +17,59 @@ namespace APIPetrack.Controllers
             _context = pContext;
         }
 
+        [HttpGet("GetAllAdoptionPets")]
+        public async Task<IActionResult> GetAllAdoptionPets()
+        {
+            try
+            {
+                var pets = await _context.Pet
+                    .Where(p => p.OwnerTypeId == "S") // Filtrar por PetStoreShelter
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.DateOfBirth,
+                        p.Species,
+                        p.Breed,
+                        p.Gender,
+                        p.Weight,
+                        p.Location,
+                        p.OwnerId,
+                        OwnerType = "PetStoreShelter", // Fijamos el tipo como PetStoreShelter
+                        p.HealthIssues,
+                        p.PetPicture,
+                        p.ImagePublicId
+                    })
+                    .ToListAsync();
+
+                if (pets == null || !pets.Any())
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "No pets available for adoption.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Adoption pets retrieved successfully.",
+                    Data = pets
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving adoption pets.",
+                    Data = new { details = ex.Message }
+                });
+            }
+        }
+
         [Authorize]
         [HttpPost("RequestAdoption")]
         public async Task<IActionResult> RequestAdoption([FromBody] CreateAdoptionRequest request)
