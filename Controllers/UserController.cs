@@ -292,40 +292,49 @@ namespace APIPetrack.Controllers
                 });
             }
 
-            Dictionary<string, object> details = null;
+            Dictionary<string, object> result = new Dictionary<string, object>{
+
+                { "Id", user.Id },
+                { "Email", user.Email },
+                { "ProfilePicture", user.ProfilePicture },
+                { "ImagePublicId", user.ImagePublicId },
+                { "UserTypeId", user.UserTypeId },
+                { "PhoneNumber", user.PhoneNumber }
+            };
 
             switch (user.UserTypeId)
             {
                 case 'O': // PetOwner
                     var petOwner = SearchPetOwner(user.Id);
-                    details = new Dictionary<string, object>
-            {
-                { "CompleteName", petOwner.CompleteName }
-            };
+                    result.Add("UserType", "PetOwner");
+                    result.Add("CompleteName", petOwner.CompleteName);
+
                     break;
                 case 'V': // Veterinarian
                     var veterinarian = SearchVeterinarian(user.Id);
-                    details = new Dictionary<string, object>
-            {
-                { "Name", veterinarian.Name },
-                { "Address", veterinarian.Address },
-                { "CoverPicture", veterinarian.CoverPicture },
-                { "ImagePublicIdCover", veterinarian.ImagePublicIdCover },
-                { "WorkingDays", veterinarian.WorkingDays },
-                { "WorkingHours", veterinarian.WorkingHours }
-            };
+                    if (veterinarian != null)
+                    {
+                        result.Add("UserType", "Veterinarian");
+                        result.Add("Name", veterinarian.Name);
+                        result.Add("CoverPicture", veterinarian.CoverPicture);
+                        result.Add("ImagePublicIdCover", veterinarian.ImagePublicIdCover);
+                        result.Add("Address", veterinarian.Address);
+                        result.Add("WorkingDays", veterinarian.WorkingDays);
+                        result.Add("WorkingHours", veterinarian.WorkingHours);
+                    }
                     break;
                 case 'S': // PetStoreShelter
                     var petStoreShelter = SearchPetStoreShelter(user.Id);
-                    details = new Dictionary<string, object>
-            {
-                { "Name", petStoreShelter.Name },
-                { "Address", petStoreShelter.Address },
-                { "CoverPicture", petStoreShelter.CoverPicture },
-                { "ImagePublicIdCover", petStoreShelter.ImagePublicIdCover },
-                { "WorkingDays", petStoreShelter.WorkingDays },
-                { "WorkingHours", petStoreShelter.WorkingHours }
-            };
+                    if (petStoreShelter != null)
+                    {
+                        result.Add("UserType", "PetStoreShelter");
+                        result.Add("Name", petStoreShelter.Name);
+                        result.Add("Address", petStoreShelter.Address);
+                        result.Add("CoverPicture", petStoreShelter.CoverPicture);
+                        result.Add("ImagePublicIdCover", petStoreShelter.ImagePublicIdCover);
+                        result.Add("WorkingDays", petStoreShelter.WorkingDays);
+                        result.Add("WorkingHours", petStoreShelter.WorkingHours);
+                    }
                     break;
                 default:
                     return BadRequest(new ApiResponse<object>
@@ -335,16 +344,6 @@ namespace APIPetrack.Controllers
                         Data = null
                     });
             }
-
-            var result = new
-            {
-                user.Id,
-                user.UserTypeId,
-                user.ProfilePicture,
-                user.ImagePublicId,
-                user.PhoneNumber,
-                details
-            };
 
             return Ok(new ApiResponse<object>
             {
