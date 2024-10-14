@@ -177,31 +177,31 @@ namespace APIPetrack.Controllers
                             var petOwner = SearchPetOwner(user.Id);
                             details = new Dictionary<string, object>
                             {
-                                { "CompleteName", petOwner.CompleteName }
+                                { "completeName", petOwner.CompleteName }
                             };
                             break;
                         case 'V': // Veterinarian
                             var veterinarian = SearchVeterinarian(user.Id);
                             details = new Dictionary<string, object>
                             {
-                                { "Name", veterinarian.Name },
-                                { "Address", veterinarian.Address },
-                                { "CoverPicture", veterinarian.CoverPicture },
-                                { "ImagePublicIdCover", veterinarian.ImagePublicIdCover },
-                                { "WorkingDays", veterinarian.WorkingDays },
-                                { "WorkingHours", veterinarian.WorkingHours }
+                                { "name", veterinarian.Name },
+                                { "address", veterinarian.Address },
+                                { "coverPicture", veterinarian.CoverPicture },
+                                { "imagePublicIdCover", veterinarian.ImagePublicIdCover },
+                                { "workingDays", veterinarian.WorkingDays },
+                                { "workingHours", veterinarian.WorkingHours }
                             };
                             break;
                         case 'S': // PetStoreShelter
                             var petStoreShelter = SearchPetStoreShelter(user.Id);
                             details = new Dictionary<string, object>
                             {
-                                { "Name", petStoreShelter.Name },
-                                { "Address", petStoreShelter.Address },
-                                { "CoverPicture", petStoreShelter.CoverPicture },
-                                { "ImagePublicIdCover", petStoreShelter.ImagePublicIdCover },
-                                { "WorkingDays", petStoreShelter.WorkingDays },
-                                { "WorkingHours", petStoreShelter.WorkingHours }
+                                { "name", petStoreShelter.Name },
+                                { "address", petStoreShelter.Address },
+                                { "coverPicture", petStoreShelter.CoverPicture },
+                                { "imagePublicIdCover", petStoreShelter.ImagePublicIdCover },
+                                { "workingDays", petStoreShelter.WorkingDays },
+                                { "workingHours", petStoreShelter.WorkingHours }
                             };
 
                             break;
@@ -294,46 +294,46 @@ namespace APIPetrack.Controllers
 
             Dictionary<string, object> result = new Dictionary<string, object>{
 
-                { "Id", user.Id },
-                { "Email", user.Email },
-                { "ProfilePicture", user.ProfilePicture },
-                { "ImagePublicId", user.ImagePublicId },
-                { "UserTypeId", user.UserTypeId },
-                { "PhoneNumber", user.PhoneNumber }
+                { "id", user.Id },
+                { "email", user.Email },
+                { "profilePicture", user.ProfilePicture },
+                { "imagePublicId", user.ImagePublicId },
+                { "userTypeId", user.UserTypeId },
+                { "phoneNumber", user.PhoneNumber }
             };
 
             switch (user.UserTypeId)
             {
                 case 'O': // PetOwner
                     var petOwner = SearchPetOwner(user.Id);
-                    result.Add("UserType", "PetOwner");
-                    result.Add("CompleteName", petOwner.CompleteName);
+                    result.Add("userType", "PetOwner");
+                    result.Add("completeName", petOwner.CompleteName);
 
                     break;
                 case 'V': // Veterinarian
                     var veterinarian = SearchVeterinarian(user.Id);
                     if (veterinarian != null)
                     {
-                        result.Add("UserType", "Veterinarian");
-                        result.Add("Name", veterinarian.Name);
-                        result.Add("CoverPicture", veterinarian.CoverPicture);
-                        result.Add("ImagePublicIdCover", veterinarian.ImagePublicIdCover);
-                        result.Add("Address", veterinarian.Address);
-                        result.Add("WorkingDays", veterinarian.WorkingDays);
-                        result.Add("WorkingHours", veterinarian.WorkingHours);
+                        result.Add("userType", "Veterinarian");
+                        result.Add("name", veterinarian.Name);
+                        result.Add("coverPicture", veterinarian.CoverPicture);
+                        result.Add("imagePublicIdCover", veterinarian.ImagePublicIdCover);
+                        result.Add("address", veterinarian.Address);
+                        result.Add("workingDays", veterinarian.WorkingDays);
+                        result.Add("workingHours", veterinarian.WorkingHours);
                     }
                     break;
                 case 'S': // PetStoreShelter
                     var petStoreShelter = SearchPetStoreShelter(user.Id);
                     if (petStoreShelter != null)
                     {
-                        result.Add("UserType", "PetStoreShelter");
-                        result.Add("Name", petStoreShelter.Name);
-                        result.Add("Address", petStoreShelter.Address);
-                        result.Add("CoverPicture", petStoreShelter.CoverPicture);
-                        result.Add("ImagePublicIdCover", petStoreShelter.ImagePublicIdCover);
-                        result.Add("WorkingDays", petStoreShelter.WorkingDays);
-                        result.Add("WorkingHours", petStoreShelter.WorkingHours);
+                        result.Add("userType", "PetStoreShelter");
+                        result.Add("name", petStoreShelter.Name);
+                        result.Add("address", petStoreShelter.Address);
+                        result.Add("coverPicture", petStoreShelter.CoverPicture);
+                        result.Add("imagePublicIdCover", petStoreShelter.ImagePublicIdCover);
+                        result.Add("workingDays", petStoreShelter.WorkingDays);
+                        result.Add("workingHours", petStoreShelter.WorkingHours);
                     }
                     break;
                 default:
@@ -416,6 +416,67 @@ namespace APIPetrack.Controllers
             }
         }
 
+        [HttpPut("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Invalid input data.",
+                    Data = ModelState
+                });
+            }
+
+            try
+            {
+                var user = await _context.AppUser.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Please check the provided details and try again.",
+                        Data = null
+                    });
+                }
+
+                if (model.NewPassword != model.ConfirmPassword)
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "New password and confirmation do not match.",
+                        Data = null
+                    });
+                }
+
+                user.Password = _passwordHasher.HashPassword(model.NewPassword);
+
+                _context.AppUser.Update(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Password reset successfully.",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while resetting the password.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+
         [HttpGet("DetailsUser/{id}")]
         public async Task<IActionResult> DetailsUser(int id)
         {
@@ -433,12 +494,12 @@ namespace APIPetrack.Controllers
 
             Dictionary<string, object> details = new Dictionary<string, object>{
 
-                { "Id", user.Id },
-                { "Email", user.Email },
-                { "ProfilePicture", user.ProfilePicture },
-                { "ImagePublicId", user.ImagePublicId },
-                { "UserTypeId", user.UserTypeId },
-                { "PhoneNumber", user.PhoneNumber }
+                { "id", user.Id },
+                { "email", user.Email },
+                { "profilePicture", user.ProfilePicture },
+                { "imagePublicId", user.ImagePublicId },
+                { "userTypeId", user.UserTypeId },
+                { "phoneNumber", user.PhoneNumber }
             };
 
             switch (user.UserTypeId)
@@ -447,8 +508,8 @@ namespace APIPetrack.Controllers
                     var petOwner = SearchPetOwner(user.Id);
                     if (petOwner != null)
                     {
-                        details.Add("UserType", "PetOwner");
-                        details.Add("CompleteName", petOwner.CompleteName);
+                        details.Add("userType", "PetOwner");
+                        details.Add("completeName", petOwner.CompleteName);
                     }
                     break;
 
@@ -456,13 +517,13 @@ namespace APIPetrack.Controllers
                     var veterinarian = SearchVeterinarian(user.Id);
                     if (veterinarian != null)
                     {
-                        details.Add("UserType", "Veterinarian");
-                        details.Add("Name", veterinarian.Name);
-                        details.Add("CoverPicture", veterinarian.CoverPicture);
-                        details.Add("ImagePublicIdCover", veterinarian.ImagePublicIdCover);
-                        details.Add("Address", veterinarian.Address);
-                        details.Add("WorkingDays", veterinarian.WorkingDays);
-                        details.Add("WorkingHours", veterinarian.WorkingHours);
+                        details.Add("userType", "Veterinarian");
+                        details.Add("name", veterinarian.Name);
+                        details.Add("coverPicture", veterinarian.CoverPicture);
+                        details.Add("imagePublicIdCover", veterinarian.ImagePublicIdCover);
+                        details.Add("address", veterinarian.Address);
+                        details.Add("workingDays", veterinarian.WorkingDays);
+                        details.Add("workingHours", veterinarian.WorkingHours);
                     }
                     break;
 
@@ -470,13 +531,13 @@ namespace APIPetrack.Controllers
                     var petStoreShelter = SearchPetStoreShelter(user.Id);
                     if (petStoreShelter != null)
                     {
-                        details.Add("UserType", "PetStoreShelter");
-                        details.Add("Name", petStoreShelter.Name);
-                        details.Add("Address", petStoreShelter.Address);
-                        details.Add("CoverPicture", petStoreShelter.CoverPicture);
-                        details.Add("ImagePublicIdCover", petStoreShelter.ImagePublicIdCover);
-                        details.Add("WorkingDays", petStoreShelter.WorkingDays);
-                        details.Add("WorkingHours", petStoreShelter.WorkingHours);
+                        details.Add("userType", "PetStoreShelter");
+                        details.Add("name", petStoreShelter.Name);
+                        details.Add("address", petStoreShelter.Address);
+                        details.Add("coverPicture", petStoreShelter.CoverPicture);
+                        details.Add("imagePublicIdCover", petStoreShelter.ImagePublicIdCover);
+                        details.Add("workingDays", petStoreShelter.WorkingDays);
+                        details.Add("workingHours", petStoreShelter.WorkingHours);
                     }
                     break;
 
@@ -521,15 +582,15 @@ namespace APIPetrack.Controllers
                 if (veterinarian != null)
                 {
                     var details = new Dictionary<string, object>{
-                        { "Id", user.Id },
-                        { "Email", user.Email },
-                        { "Name", veterinarian.Name },
-                        { "ProfilePicture", user.ProfilePicture },
-                        { "CoverPicture", veterinarian.CoverPicture },
-                        { "ImagePublicIdCover", veterinarian.ImagePublicIdCover },
-                        { "PhoneNumber", user.PhoneNumber },
-                        { "WorkingDays", veterinarian.WorkingDays },
-                        { "WorkingHours", veterinarian.WorkingHours }
+                        { "id", user.Id },
+                        { "email", user.Email },
+                        { "name", veterinarian.Name },
+                        { "profilePicture", user.ProfilePicture },
+                        { "coverPicture", veterinarian.CoverPicture },
+                        { "imagePublicIdCover", veterinarian.ImagePublicIdCover },
+                        { "phoneNumber", user.PhoneNumber },
+                        { "workingDays", veterinarian.WorkingDays },
+                        { "workingHours", veterinarian.WorkingHours }
                     };
 
                     veterinarianDetailsList.Add(details);
@@ -569,16 +630,16 @@ namespace APIPetrack.Controllers
                 if (petStoreShelter != null)
                 {
                     var details = new Dictionary<string, object>{
-                        { "Id", user.Id },
-                        { "Email", user.Email },
-                        { "Name", petStoreShelter.Name },
-                        { "ProfilePicture", user.ProfilePicture },
-                        { "Address", petStoreShelter.Address },
-                        { "PhoneNumber", user.PhoneNumber },
-                        { "CoverPicture", petStoreShelter.CoverPicture },
-                        { "ImagePublicIdCover", petStoreShelter.ImagePublicIdCover },
-                        { "WorkingDays", petStoreShelter.WorkingDays },
-                        { "WorkingHours", petStoreShelter.WorkingHours }
+                        { "id", user.Id },
+                        { "email", user.Email },
+                        { "name", petStoreShelter.Name },
+                        { "profilePicture", user.ProfilePicture },
+                        { "address", petStoreShelter.Address },
+                        { "phoneNumber", user.PhoneNumber },
+                        { "coverPicture", petStoreShelter.CoverPicture },
+                        { "imagePublicIdCover", petStoreShelter.ImagePublicIdCover },
+                        { "workingDays", petStoreShelter.WorkingDays },
+                        { "workingHours", petStoreShelter.WorkingHours }
                     };
 
                     petStoreShelterDetailsList.Add(details);
