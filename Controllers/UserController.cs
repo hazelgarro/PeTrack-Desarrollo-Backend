@@ -84,29 +84,6 @@ namespace APIPetrack.Controllers
                         _context.PetOwner.Add(petOwner);
                         break;
 
-                    case 'V': // Veterinarian
-
-                        var clinic = request.AdditionalData.TryGetValue("Name", out var NameVet);
-                        var adddress = request.AdditionalData.TryGetValue("Address", out var addressVet);
-                        var coverPictureVet = request.AdditionalData.TryGetValue("CoverPicture", out var coverPictureVeterinarian);
-                        var workingDaysVet = request.AdditionalData.TryGetValue("WorkingDays", out var workingDaysVeterinarian);
-                        var workingHoursVet = request.AdditionalData.TryGetValue("WorkingHours", out var workingHoursVeterinarian);
-                        var imagePublicCoverV = request.AdditionalData.TryGetValue("ImagePublicIdCover", out var imagePublicIdCoverVet);
-
-                        var veterinarian = new Veterinarian
-                        {
-                            AppUserId = userCreated.Id,
-                            Name = NameVet?.ToString(),
-                            Address = addressVet?.ToString(),
-                            CoverPicture = coverPictureVeterinarian?.ToString(),
-                            WorkingDays = workingDaysVeterinarian?.ToString(),
-                            WorkingHours = workingHoursVeterinarian?.ToString(),
-                            ImagePublicIdCover = imagePublicIdCoverVet?.ToString(),
-                        };
-
-                        _context.Veterinarian.Add(veterinarian);
-                        break;
-
                     case 'S': // PetStoreShelter
 
                         var nameStore = request.AdditionalData.TryGetValue("Name", out var namePetStore);
@@ -178,18 +155,6 @@ namespace APIPetrack.Controllers
                             details = new Dictionary<string, object>
                             {
                                 { "completeName", petOwner.CompleteName }
-                            };
-                            break;
-                        case 'V': // Veterinarian
-                            var veterinarian = SearchVeterinarian(user.Id);
-                            details = new Dictionary<string, object>
-                            {
-                                { "name", veterinarian.Name },
-                                { "address", veterinarian.Address },
-                                { "coverPicture", veterinarian.CoverPicture },
-                                { "imagePublicIdCover", veterinarian.ImagePublicIdCover },
-                                { "workingDays", veterinarian.WorkingDays },
-                                { "workingHours", veterinarian.WorkingHours }
                             };
                             break;
                         case 'S': // PetStoreShelter
@@ -309,19 +274,6 @@ namespace APIPetrack.Controllers
                     result.Add("userType", "PetOwner");
                     result.Add("completeName", petOwner.CompleteName);
 
-                    break;
-                case 'V': // Veterinarian
-                    var veterinarian = SearchVeterinarian(user.Id);
-                    if (veterinarian != null)
-                    {
-                        result.Add("userType", "Veterinarian");
-                        result.Add("name", veterinarian.Name);
-                        result.Add("coverPicture", veterinarian.CoverPicture);
-                        result.Add("imagePublicIdCover", veterinarian.ImagePublicIdCover);
-                        result.Add("address", veterinarian.Address);
-                        result.Add("workingDays", veterinarian.WorkingDays);
-                        result.Add("workingHours", veterinarian.WorkingHours);
-                    }
                     break;
                 case 'S': // PetStoreShelter
                     var petStoreShelter = SearchPetStoreShelter(user.Id);
@@ -513,20 +465,6 @@ namespace APIPetrack.Controllers
                     }
                     break;
 
-                case 'V': // Veterinarian
-                    var veterinarian = SearchVeterinarian(user.Id);
-                    if (veterinarian != null)
-                    {
-                        details.Add("userType", "Veterinarian");
-                        details.Add("name", veterinarian.Name);
-                        details.Add("coverPicture", veterinarian.CoverPicture);
-                        details.Add("imagePublicIdCover", veterinarian.ImagePublicIdCover);
-                        details.Add("address", veterinarian.Address);
-                        details.Add("workingDays", veterinarian.WorkingDays);
-                        details.Add("workingHours", veterinarian.WorkingHours);
-                    }
-                    break;
-
                 case 'S': // PetStoreShelter
                     var petStoreShelter = SearchPetStoreShelter(user.Id);
                     if (petStoreShelter != null)
@@ -556,54 +494,6 @@ namespace APIPetrack.Controllers
                 Message = "User details retrieved successfully.",
                 Data = details
             });
-        }
-
-        [HttpGet("ListVeterinarians")]
-        public async Task<IActionResult> ListVeterinarians()
-        {
-            var veterinarianUsers = await _context.AppUser.Where(user => user.UserTypeId == 'V').ToListAsync();
-
-            if (veterinarianUsers == null || veterinarianUsers.Count == 0)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Result = false,
-                    Message = "No veterinarians found.",
-                    Data = null
-                });
-            }
-
-            var veterinarianDetailsList = new List<Dictionary<string, object>>();
-
-            foreach (var user in veterinarianUsers)
-            {
-                var veterinarian = SearchVeterinarian(user.Id);
-
-                if (veterinarian != null)
-                {
-                    var details = new Dictionary<string, object>{
-                        { "id", user.Id },
-                        { "email", user.Email },
-                        { "name", veterinarian.Name },
-                        { "profilePicture", user.ProfilePicture },
-                        { "coverPicture", veterinarian.CoverPicture },
-                        { "imagePublicIdCover", veterinarian.ImagePublicIdCover },
-                        { "phoneNumber", user.PhoneNumber },
-                        { "workingDays", veterinarian.WorkingDays },
-                        { "workingHours", veterinarian.WorkingHours }
-                    };
-
-                    veterinarianDetailsList.Add(details);
-                }
-            }
-
-            return Ok(new ApiResponse<List<Dictionary<string, object>>>
-            {
-                Result = true,
-                Message = "Veterinarians retrieved successfully.",
-                Data = veterinarianDetailsList
-            });
-
         }
 
         [HttpGet("ListPetStoreShelters")]
@@ -697,19 +587,6 @@ namespace APIPetrack.Controllers
                     }
                     break;
 
-                case 'V': // Veterinarian
-                    var veterinarian = await _context.Veterinarian.FirstOrDefaultAsync(v => v.AppUserId == id);
-                    if (veterinarian != null)
-                    {
-                        veterinarian.Name = updatedUser.Name;
-                        veterinarian.Address = updatedUser.Address;
-                        veterinarian.CoverPicture = updatedUser.CoverPicture;
-                        veterinarian.ImagePublicIdCover = updatedUser.ImagePublicIdCover;
-                        veterinarian.WorkingDays = updatedUser.WorkingDays;
-                        veterinarian.WorkingHours = updatedUser.WorkingHours;
-                    }
-                    break;
-
                 case 'S': // PetStoreShelter
                     var petStoreShelter = await _context.PetStoreShelter.FirstOrDefaultAsync(s => s.AppUserId == id);
                     if (petStoreShelter != null)
@@ -750,7 +627,6 @@ namespace APIPetrack.Controllers
             {
                 var user = await _context.AppUser
                     .Include(u => u.PetOwner)
-                    .Include(u => u.Veterinarian)
                     .Include(u => u.PetStoreShelter)
                     .FirstOrDefaultAsync(u => u.Id == id);
 
@@ -800,14 +676,6 @@ namespace APIPetrack.Controllers
             var petOwner = new PetOwner();
             petOwner = _context.PetOwner.FirstOrDefault(po => po.AppUserId == id);
             return petOwner;
-        }
-
-        [HttpGet("SearchVeterinarian")]
-        public Veterinarian SearchVeterinarian(int id)
-        {
-            var veterinarian = new Veterinarian();
-            veterinarian = _context.Veterinarian.FirstOrDefault(po => po.AppUserId == id);
-            return veterinarian;
         }
 
         [HttpGet("SearchPetStoreShelter")]

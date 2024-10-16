@@ -12,7 +12,6 @@ namespace APIPetrack.Context
         public DbSet<AppUser> AppUser { get; set; }
         public DbSet<PetOwner> PetOwner { get; set; }
         public DbSet<PetStoreShelter> PetStoreShelter { get; set; }
-        public DbSet<Veterinarian> Veterinarian { get; set; }
         public DbSet<Pet> Pet { get; set; }
         public DbSet<AdoptionRequest> AdoptionRequest { get; set; }
         public DbSet<Notification> Notification { get; set; }
@@ -22,12 +21,6 @@ namespace APIPetrack.Context
                 .HasOne(p => p.AppUser)
                 .WithOne(u => u.PetOwner)
                 .HasForeignKey<PetOwner>(p => p.AppUserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Veterinarian>()
-                .HasOne(v => v.AppUser)
-                .WithOne(u => u.Veterinarian)
-                .HasForeignKey<Veterinarian>(v => v.AppUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PetStoreShelter>()

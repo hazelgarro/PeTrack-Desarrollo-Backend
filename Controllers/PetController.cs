@@ -133,7 +133,7 @@ namespace APIPetrack.Controllers
                         p.Weight,
                         p.Location,
                         p.OwnerId,
-                        OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : p.OwnerTypeId == "S" ? "PetStoreShelter" : "Veterinarian",
+                        OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : "PetStoreShelter",
                         p.HealthIssues,
                         p.PetPicture,
                         p.ImagePublicId

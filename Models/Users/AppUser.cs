@@ -41,7 +41,6 @@ namespace APIPetrack.Models.Users
         }
 
         public PetOwner PetOwner { get; set; }
-        public Veterinarian Veterinarian { get; set; }
         public PetStoreShelter PetStoreShelter { get; set; }
     }
 }
