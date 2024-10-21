@@ -19,12 +19,16 @@ namespace APIPetrack.Controllers
         private readonly DbContextPetrack _context;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IAuthorizationServices _authorizationService;
+        private readonly EmailService _emailService;
+        private readonly EmailTemplateService _emailTemplateService;
 
-        public UserController(DbContextPetrack pContext, IPasswordHasher passwordHasher, IAuthorizationServices authorizationService)
+        public UserController(DbContextPetrack pContext, IPasswordHasher passwordHasher, IAuthorizationServices authorizationService, EmailService emailService, EmailTemplateService emailTemplateService)
         {
             _context = pContext;
             _passwordHasher = passwordHasher;
             _authorizationService = authorizationService;
+            _emailService = emailService;
+            _emailTemplateService = emailTemplateService;
         }
 
         [HttpPost("CreateAccount")]
@@ -73,7 +77,7 @@ namespace APIPetrack.Controllers
                 {
                     case 'O': // PetOwner
 
-                        var namePetOwner = request.AdditionalData.TryGetValue("CompleteName", out var completeNamePetOwner);
+                        var namePetOwner = request.AdditionalData.TryGetValue("completeName", out var completeNamePetOwner);
 
                         var petOwner = new PetOwner
                         {
@@ -86,12 +90,12 @@ namespace APIPetrack.Controllers
 
                     case 'S': // PetStoreShelter
 
-                        var nameStore = request.AdditionalData.TryGetValue("Name", out var namePetStore);
-                        var adddressStore = request.AdditionalData.TryGetValue("Address", out var addressStoreShelter);
-                        var coverPictureStore = request.AdditionalData.TryGetValue("CoverPicture", out var coverPicturePetStore);
-                        var workingDaysStore = request.AdditionalData.TryGetValue("WorkingDays", out var workingDaysPetStore);
-                        var workingHoursStore = request.AdditionalData.TryGetValue("WorkingHours", out var workingHoursPetStore);
-                        var imagePublicCoverStore = request.AdditionalData.TryGetValue("ImagePublicIdCover", out var imagePublicIdCoverStoreShelter);
+                        var nameStore = request.AdditionalData.TryGetValue("name", out var namePetStore);
+                        var adddressStore = request.AdditionalData.TryGetValue("address", out var addressStoreShelter);
+                        var coverPictureStore = request.AdditionalData.TryGetValue("coverPicture", out var coverPicturePetStore);
+                        var workingDaysStore = request.AdditionalData.TryGetValue("workingDays", out var workingDaysPetStore);
+                        var workingHoursStore = request.AdditionalData.TryGetValue("workingHours", out var workingHoursPetStore);
+                        var imagePublicCoverStore = request.AdditionalData.TryGetValue("imagePublicIdCover", out var imagePublicIdCoverStoreShelter);
 
                         var petStoreShelter = new PetStoreShelter
                         {
@@ -368,10 +372,69 @@ namespace APIPetrack.Controllers
             }
         }
 
-        [HttpPut("ResetPassword")]
+        [HttpPost("RequestPasswordReset")]
+        public async Task<IActionResult> RequestPasswordReset(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Email is required.",
+                    Data = null
+                });
+            }
+
+            try
+            {
+                var user = await _context.AppUser.FirstOrDefaultAsync(u => u.Email == email);
+
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Please check the provided email and try again.",
+                        Data = null
+                    });
+                }
+
+                var token = Guid.NewGuid().ToString();
+
+                user.PasswordResetToken = token;
+                user.TokenExpiration = DateTime.UtcNow.AddHours(1); // Expiración del token en 1 hora
+                await _context.SaveChangesAsync();
+
+                string encryptedToken = EmailService.Encrypt(token);
+
+                string resetUrl = $"https://petrack-ten.vercel.app/Login?token={Uri.EscapeDataString(encryptedToken)}";
+
+                string emailBody = _emailTemplateService.GetPasswordResetEmailBody(resetUrl);
+
+                await _emailService.SendEmailAsync(email, "Reset Password", emailBody);
+
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "A password reset link has been sent to your email.",
+                    Data = resetUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while requesting password reset.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPassword model)
         {
-            if (!ModelState.IsValid)
+            if (model == null || !ModelState.IsValid)
             {
                 return BadRequest(new ApiResponse<object>
                 {
@@ -383,29 +446,48 @@ namespace APIPetrack.Controllers
 
             try
             {
-                var user = await _context.AppUser.FirstOrDefaultAsync(u => u.Email == model.Email);
+                if (string.IsNullOrWhiteSpace(model.Token))
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Token cannot be null or empty.",
+                        Data = null
+                    });
+                }
+
+                string decodedToken = Uri.UnescapeDataString(model.Token);
+                Console.WriteLine($"Decoded Token: {decodedToken}");
+
+                string decryptedToken = EmailService.Decrypt(decodedToken);
+
+                if (string.IsNullOrWhiteSpace(decryptedToken))
+                {
+                    Console.WriteLine("Failed to decrypt token after decoding.");
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Failed to decrypt token.",
+                        Data = null
+                    });
+                }
+
+                var user = await _context.AppUser
+                    .FirstOrDefaultAsync(u => u.PasswordResetToken == decryptedToken && u.TokenExpiration > DateTime.UtcNow);
 
                 if (user == null)
                 {
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Please check the provided details and try again.",
-                        Data = null
-                    });
-                }
-
-                if (model.NewPassword != model.ConfirmPassword)
-                {
-                    return BadRequest(new ApiResponse<object>
-                    {
-                        Result = false,
-                        Message = "New password and confirmation do not match.",
+                        Message = "Invalid token or token has expired.",
                         Data = null
                     });
                 }
 
                 user.Password = _passwordHasher.HashPassword(model.NewPassword);
+                user.PasswordResetToken = null;
+                user.TokenExpiration = null;
 
                 _context.AppUser.Update(user);
                 await _context.SaveChangesAsync();
@@ -419,6 +501,7 @@ namespace APIPetrack.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error in ResetPassword: {ex.Message}");
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,

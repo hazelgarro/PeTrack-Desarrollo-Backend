@@ -29,6 +29,11 @@ namespace APIPetrack.Models.Users
         [MaxLength(15)]
         public string PhoneNumber { get; set; }
 
+        [MaxLength(255)]
+        public string PasswordResetToken { get; set; }
+
+        public DateTime? TokenExpiration { get; set; }
+
         public class LoginUser
         {
             [Required(ErrorMessage = "Blank email is not allowed")]
