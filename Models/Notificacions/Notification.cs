@@ -1,4 +1,4 @@
-﻿namespace APIPetrack.Models.Adoptions
+﻿namespace APIPetrack.Models.Notificacions
 {
     public class Notification
     {

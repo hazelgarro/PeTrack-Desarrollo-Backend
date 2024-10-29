@@ -407,7 +407,7 @@ namespace APIPetrack.Controllers
 
                 string encryptedToken = EmailService.Encrypt(token);
 
-                string resetUrl = $"https://petrack-ten.vercel.app/Login?token={Uri.EscapeDataString(encryptedToken)}";
+                string resetUrl = $"https://petrack-ten.vercel.app/ResetPassword?token={Uri.EscapeDataString(encryptedToken)}";
 
                 string emailBody = _emailTemplateService.GetPasswordResetEmailBody(resetUrl);
 
@@ -702,7 +702,7 @@ namespace APIPetrack.Controllers
             });
         }
 
-       // [Authorize]
+        [Authorize]
         [HttpDelete("DeleteAccount/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

@@ -1,5 +1,7 @@
 ﻿using APIPetrack.Models.Adoptions;
+using APIPetrack.Models.Notificacions;
 using APIPetrack.Models.Pets;
+using APIPetrack.Models.Transfer;
 using APIPetrack.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +17,8 @@ namespace APIPetrack.Context
         public DbSet<Pet> Pet { get; set; }
         public DbSet<AdoptionRequest> AdoptionRequest { get; set; }
         public DbSet<Notification> Notification { get; set; }
+
+        public DbSet<TransferRequest> TransferRequest {  get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PetOwner>()

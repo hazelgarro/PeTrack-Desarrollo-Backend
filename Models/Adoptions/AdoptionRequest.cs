@@ -17,6 +17,7 @@ namespace APIPetrack.Models.Adoptions
 
         public bool IsDelivered { get; set; }
 
+        public DateTime? DeliveryDate { get; set; }
         public Pet Pet { get; set; } // Propiedad de navegación a la entidad Pet
         public AppUser CurrentOwner { get; set; } // Propiedad de navegación a la entidad User (dueño actual)
 

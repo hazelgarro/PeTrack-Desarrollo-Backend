@@ -1,6 +1,7 @@
 ﻿using APIPetrack.Context;
 using APIPetrack.Models.Adoptions;
 using APIPetrack.Models.Custom;
+using APIPetrack.Models.Notificacions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -225,7 +226,9 @@ namespace APIPetrack.Controllers
                 });
             }
 
+            adoptionRequest.IsAccepted = "Delivered";
             adoptionRequest.IsDelivered = true;
+            adoptionRequest.DeliveryDate = DateTime.Now;
 
             await UpdatePetOwner(adoptionRequest.PetId, adoptionRequest.NewOwnerId, adoptionRequest.OwnerType);
 
@@ -235,8 +238,10 @@ namespace APIPetrack.Controllers
 
             foreach (var request in otherRequests)
             {
-                if (request.IsAccepted != "Approved")
+                if (request.IsAccepted != "Delivered")
                 {
+                    request.IsAccepted = "Rejected";
+
                     var notification = new Notification
                     {
                         UserId = request.NewOwnerId,
@@ -247,8 +252,6 @@ namespace APIPetrack.Controllers
                     _context.Notification.Add(notification);
                 }
             }
-
-            _context.AdoptionRequest.RemoveRange(otherRequests.Where(r => r.IsAccepted != "Accepted"));
 
             try
             {
@@ -297,12 +300,12 @@ namespace APIPetrack.Controllers
                 });
             }
 
-            if (adoptionRequest.IsAccepted != "Accepted")
+            if (adoptionRequest.IsAccepted == "Delivered")
             {
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Only accepted requests can be canceled.",
+                    Message = "Cannot cancel an adoption request that has already been delivered.",
                     Data = null
                 });
             }
@@ -458,7 +461,138 @@ namespace APIPetrack.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetPendingAdoptionRequest")]
+        [HttpGet("ListAllAdoptionRequestsForUser/{userId}")]
+        public async Task<IActionResult> GetAdoptionRequestsByUser(int userId)
+        {
+            try
+            {
+                var requests = await _context.AdoptionRequest
+                .Where(ar => ar.CurrentOwnerId == userId || ar.NewOwnerId == userId)
+                .Include(ar => ar.Pet)
+                .Include(ar => ar.CurrentOwner)
+                .Include(ar => ar.NewOwner)
+                .Select(ar => new
+                {
+                    Id = ar.Id,
+                    PetId = ar.PetId,
+                    PetName = ar.Pet.Name,
+                    PetSpecies = ar.Pet.Species,
+                    PetBreed = ar.Pet.Breed,
+                    PetGender = ar.Pet.Gender,
+                    PetPicture = ar.Pet.PetPicture,
+                    CurrentOwner = new
+                    {
+                        ar.CurrentOwner.Email,
+                        ar.CurrentOwner.ProfilePicture,
+                        ar.CurrentOwner.PhoneNumber
+                    },
+                    Requester = new
+                    {
+                        ar.NewOwner.Email,
+                        ar.NewOwner.ProfilePicture,
+                        ar.NewOwner.PhoneNumber
+                    },
+                    IsAccepted = ar.IsAccepted,
+                    RequestDate = ar.RequestDate
+                })
+                .ToListAsync();
+
+                if (!requests.Any())
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "No adoption requests found for this user.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new ApiResponse<IEnumerable<object>>
+                {
+                    Result = true,
+                    Message = "Adoption requests for the user retrieved successfully.",
+                    Data = requests
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving adoption requests for this user.",
+                    Data = new { details = ex.Message }
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("ListPendingAdoptionRequestsForUser/{userId}")]
+        public async Task<IActionResult> GetPendingAdoptionRequestsByUser(int userId)
+        {
+            try
+            {
+                var requests = await _context.AdoptionRequest
+                .Where(ar => ar.CurrentOwnerId == userId || ar.NewOwnerId == userId)
+                .Where(r => r.IsAccepted == "Pending")
+                .Include(ar => ar.Pet)
+                .Include(ar => ar.CurrentOwner)
+                .Include(ar => ar.NewOwner)
+                .Select(ar => new
+                {
+                    Id = ar.Id,
+                    PetId = ar.PetId,
+                    PetName = ar.Pet.Name,
+                    PetSpecies = ar.Pet.Species,
+                    PetBreed = ar.Pet.Breed,
+                    PetGender = ar.Pet.Gender,
+                    PetPicture = ar.Pet.PetPicture,
+                    CurrentOwner = new
+                    {
+                        ar.CurrentOwner.Email,
+                        ar.CurrentOwner.ProfilePicture,
+                        ar.CurrentOwner.PhoneNumber
+                    },
+                    Requester = new
+                    {
+                        ar.NewOwner.Email,
+                        ar.NewOwner.ProfilePicture,
+                        ar.NewOwner.PhoneNumber
+                    },
+                    IsAccepted = ar.IsAccepted,
+                    RequestDate = ar.RequestDate
+                })
+                .ToListAsync();
+
+                if (!requests.Any())
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "No adoption requests found for this user.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new ApiResponse<IEnumerable<object>>
+                {
+                    Result = true,
+                    Message = "Adoption requests for the user retrieved successfully.",
+                    Data = requests
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving adoption requests for this user.",
+                    Data = new { details = ex.Message }
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("ListPendingAdoptionRequest")]
         public async Task<IActionResult> GetPendingAdoptionRequests()
         {
             try
@@ -631,7 +765,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Accepted adoption requests retrieved successfully.",
+                    Message = "Cancelled adoption requests retrieved successfully.",
                     Data = acceptedRequests
                 });
             }
@@ -640,40 +774,62 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving accepted adoption requests.",
+                    Message = "An error occurred while retrieving cancelled adoption requests.",
                     Data = new { details = ex.Message }
                 });
             }
         }
 
         [Authorize]
-        [HttpPut("MarkNotificationAsRead/{notificationId}")]
-        public async Task<IActionResult> MarkNotificationAsRead(int notificationId)
+        [HttpGet("ListRejectedAdoptionRequest")]
+        public async Task<IActionResult> GetRejectedAdoptionRequests()
         {
             try
             {
-                var notification = await _context.Notification.FirstOrDefaultAsync(n => n.Id == notificationId);
+                var acceptedRequests = await _context.AdoptionRequest
+            .Where(r => r.IsAccepted == "Rejected")
+            .Include(r => r.Pet)
+            .Select(ar => new
+            {
+                Id = ar.Id,
+                PetId = ar.PetId,
+                PetName = ar.Pet.Name,
+                PetSpecies = ar.Pet.Species,
+                PetBreed = ar.Pet.Breed,
+                PetGender = ar.Pet.Gender,
+                PetPicture = ar.Pet.PetPicture,
+                PreviousOwner = new
+                {
+                    ar.CurrentOwner.Email,
+                    ar.CurrentOwner.ProfilePicture,
+                    ar.CurrentOwner.PhoneNumber
+                },
+                CurrentOwner = new
+                {
+                    ar.NewOwner.Email,
+                    ar.NewOwner.ProfilePicture,
+                    ar.NewOwner.PhoneNumber
+                },
+                IsAccepted = ar.IsAccepted,
+                RequestDate = ar.RequestDate
+            })
+            .ToListAsync();
 
-                if (notification == null)
+                if (!acceptedRequests.Any())
                 {
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Notification not found.",
+                        Message = "No rejected requests found.",
                         Data = null
                     });
                 }
 
-                
-                notification.IsRead = true;
-
-                await _context.SaveChangesAsync();
-
-                return Ok(new ApiResponse<object>
+                return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Notification marked as read.",
-                    Data = null
+                    Message = "Rejected adoption requests retrieved successfully.",
+                    Data = acceptedRequests
                 });
             }
             catch (Exception ex)
@@ -681,40 +837,63 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while marking the notification as read.",
+                    Message = "An error occurred while retrieving rejected adoption requests.",
                     Data = new { details = ex.Message }
                 });
             }
         }
 
         [Authorize]
-        [HttpGet("GetUserNotifications/{userId}")]
-        public async Task<IActionResult> GetUserNotifications(int userId)
+        [HttpGet("ListDeliveredAdoption")]
+        public async Task<IActionResult> GetDeliveredAdoptionRequests()
         {
             try
             {
-                var notifications = await _context.Notification
-                .Where(n => n.UserId == userId && n.IsRead == false)
-                .OrderByDescending(n => n.NotificationDate)  
+                var pendingRequests = await _context.AdoptionRequest
+                .Where(r => r.IsAccepted == "Delivered")
+                .Include(r => r.Pet)
+                .Select(ar => new
+                {
+                    Id = ar.Id,
+                    PetId = ar.PetId,
+                    PetName = ar.Pet.Name,
+                    PetSpecies = ar.Pet.Species,
+                    PetBreed = ar.Pet.Breed,
+                    PetGender = ar.Pet.Gender,
+                    PetPicture = ar.Pet.PetPicture,
+                    CurrentOwner = new
+                    {
+                        ar.CurrentOwner.Email,
+                        ar.CurrentOwner.ProfilePicture,
+                        ar.CurrentOwner.PhoneNumber
+                    },
+                    Requester = new
+                    {
+                        ar.NewOwner.Email,
+                        ar.NewOwner.ProfilePicture,
+                        ar.NewOwner.PhoneNumber
+                    },
+                    IsAccepted = ar.IsAccepted,
+                    RequestDate = ar.RequestDate,
+                    DeliveryDate = ar.DeliveryDate,
+                })
                 .ToListAsync();
 
-
-
-                if (!notifications.Any())
+                if (!pendingRequests.Any())
                 {
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No notifications found for this user.",
+                        Message = "No adoption requests found.",
                         Data = null
                     });
                 }
 
-                return Ok(new ApiResponse<IEnumerable<Notification>>
+                return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Notifications retrieved successfully.",
-                    Data = notifications
+                    Message = "Delivered requests retrieved successfully.",
+                    Data = pendingRequests
                 });
             }
             catch (Exception ex)
@@ -722,11 +901,13 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving notifications.",
+                    Message = "An error occurred while retrieving adoption requests.",
                     Data = new { details = ex.Message }
                 });
             }
         }
+
+        
 
         private async Task UpdatePetOwner(int petId, int newOwnerId, string newOwnerType)
         {
