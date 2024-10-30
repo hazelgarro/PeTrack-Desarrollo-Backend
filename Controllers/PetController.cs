@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using APIPetrack.Models.Pets;
 using APIPetrack.Models.Custom;
+using System.Security.Claims;
 
 namespace APIPetrack.Controllers
 {
@@ -247,6 +248,150 @@ namespace APIPetrack.Controllers
                 });
             }
         }
+
+        [Authorize]
+        [HttpGet("GetPetsByOwner")]
+        public async Task<IActionResult> GetPetsByOwner()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int authenticatedOwnerId))
+                {
+                    return Unauthorized(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Invalid or missing user identifier.",
+                        Data = null
+                    });
+                }
+
+                var petOwner = await _context.PetOwner.FindAsync(authenticatedOwnerId);
+                var ownerType = petOwner != null ? "O" : "S"; // "O" = PetOwner, "S" = PetStoreShelter
+
+                if (petOwner == null && await _context.PetStoreShelter.FindAsync(authenticatedOwnerId) == null)
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Owner not found.",
+                        Data = null
+                    });
+                }
+
+                var pets = await _context.Pet
+                    .Where(p => p.OwnerId == authenticatedOwnerId && p.OwnerTypeId == ownerType)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.DateOfBirth,
+                        p.Species,
+                        p.Breed,
+                        p.Gender,
+                        p.Weight,
+                        p.Location,
+                        p.OwnerId,
+                        OwnerType = p.OwnerTypeId == "O" ? "PetOwner" : "PetStoreShelter",
+                        p.HealthIssues,
+                        p.PetPicture,
+                        p.ImagePublicId
+                    })
+                    .ToListAsync();
+
+                if (pets == null || !pets.Any())
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "No pets found for the authenticated owner.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pets retrieved successfully.",
+                    Data = pets
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving pets.",
+                    Data = new { details = ex.Message }
+                });
+            }
+        }
+
+        [HttpGet("GetPetsByShelter/{shelterId}")]
+        public async Task<IActionResult> GetPetsByShelter(int shelterId)
+        {
+            try
+            {
+                var petStoreShelter = await _context.PetStoreShelter.FindAsync(shelterId);
+
+                if (petStoreShelter == null)
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "Shelter not found.",
+                        Data = null
+                    });
+                }
+
+                var pets = await _context.Pet
+                    .Where(p => p.OwnerId == shelterId && p.OwnerTypeId == "S") 
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.DateOfBirth,
+                        p.Species,
+                        p.Breed,
+                        p.Gender,
+                        p.Weight,
+                        p.Location,
+                        p.OwnerId,
+                        OwnerType = "PetStoreShelter", 
+                        p.HealthIssues,
+                        p.PetPicture,
+                        p.ImagePublicId
+                    })
+                    .ToListAsync();
+
+                if (pets == null || !pets.Any())
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Result = false,
+                        Message = "No pets found for this shelter.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Pets retrieved successfully.",
+                    Data = pets
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An error occurred while retrieving pets.",
+                    Data = new { details = ex.Message }
+                });
+            }
+        }
+
 
         [Authorize]
         [HttpPut("EditPet/{petId}")]
