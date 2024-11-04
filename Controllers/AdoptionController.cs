@@ -166,6 +166,19 @@ namespace APIPetrack.Controllers
                 });
             }
 
+            bool alreadyAccepted = await _context.AdoptionRequest.AnyAsync(r => r.PetId == adoptionRequest.PetId &&
+                       (r.IsAccepted == "Accepted" || r.IsAccepted == "Delivered"));
+
+            if (alreadyAccepted)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "There is already an accepted or delivered adoption request for this pet.",
+                    Data = null
+                });
+            }
+
             adoptionRequest.IsAccepted = "Accepted";
 
             try
@@ -269,6 +282,75 @@ namespace APIPetrack.Controllers
                 {
                     Result = false,
                     Message = "Database error occurred while confirming the delivery.",
+                    Data = new { details = dbEx.Message }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "An unexpected error occurred.",
+                    Data = new { details = ex.Message }
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPut("RejectAdoptionRequest/{adoptionRequestId}")]
+        public async Task<IActionResult> RejectAdoptionRequest(int adoptionRequestId)
+        {
+            var adoptionRequest = await _context.AdoptionRequest
+                .Include(r => r.Pet)
+                .FirstOrDefaultAsync(r => r.Id == adoptionRequestId);
+            
+            if (adoptionRequest == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Adoption request not found.",
+                    Data = null
+                });
+            }
+            
+            if (adoptionRequest.IsAccepted == "Delivered")
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Cannot reject this adoption request as it has already been delivered.",
+                    Data = null
+                });
+            }
+
+            adoptionRequest.IsAccepted = "Rejected";
+
+            var notification = new Notification
+            {
+                UserId = adoptionRequest.NewOwnerId,
+                Message = $"Your adoption request for pet {adoptionRequest.Pet.Name} has been rejected.",
+                IsRead = false,
+                NotificationDate = DateTime.Now
+            };
+            _context.Notification.Add(notification);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Adoption request rejected and notification sent.",
+                    Data = null
+                });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Database error occurred while rejecting the adoption request.",
                     Data = new { details = dbEx.Message }
                 });
             }
