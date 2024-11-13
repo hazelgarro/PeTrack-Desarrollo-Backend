@@ -65,7 +65,7 @@ namespace APIPetrack.Controllers
             try
             {
                 var notifications = await _context.Notification
-                .Where(n => n.UserId == userId && n.IsRead == false)
+                .Where(n => n.UserId == userId)
                 .OrderByDescending(n => n.NotificationDate)
                 .ToListAsync();
 
