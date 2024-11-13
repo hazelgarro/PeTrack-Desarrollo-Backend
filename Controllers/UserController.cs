@@ -723,6 +723,15 @@ namespace APIPetrack.Controllers
                     });
                 }
 
+                var notifications = await _context.Notification
+                    .Where(n => n.UserId == id)
+                    .ToListAsync();
+
+                if (notifications.Any())
+                {
+                    _context.Notification.RemoveRange(notifications);
+                }
+
                 _context.AppUser.Remove(user);
                 await _context.SaveChangesAsync();
 

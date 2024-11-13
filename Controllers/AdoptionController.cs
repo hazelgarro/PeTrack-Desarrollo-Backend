@@ -106,6 +106,19 @@ namespace APIPetrack.Controllers
                 });
             }
 
+            var existingRequest = await _context.AdoptionRequest
+                .FirstOrDefaultAsync(ar => ar.PetId == request.PetId && ar.NewOwnerId == request.NewOwnerId);
+
+            if (existingRequest != null)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "You have already submitted an adoption request for this pet.",
+                    Data = null
+                });
+            }
+
             var adoptionRequest = new AdoptionRequest
             {
                 PetId = request.PetId,
