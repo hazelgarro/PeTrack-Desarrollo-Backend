@@ -29,7 +29,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid transfer request data.",
+                    Message = "Datos de solicitud de transferencia no válidos.",
                     Data = null
                 });
             }
@@ -40,7 +40,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Pet not found.",
+                    Message = "Mascota no encontrada.",
                     Data = null
                 });
             }
@@ -50,7 +50,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "You are not the owner of this pet.",
+                    Message = "Usted no es el propietario de esta mascota.",
                     Data = null
                 });
             }
@@ -61,7 +61,7 @@ namespace APIPetrack.Controllers
                 return Unauthorized(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid password.",
+                    Message = "Contraseña inválida.",
                     Data = null
                 });
             }
@@ -72,7 +72,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "New owner not found.",
+                    Message = "Nuevo propietario no encontrado.",
                     Data = null
                 });
             }
@@ -90,7 +90,7 @@ namespace APIPetrack.Controllers
             var notification = new Notification
             {
                 UserId = newOwner.Id,
-                Message = $"You have received a transfer request from {owner.Email} for pet {pet.Name}.",
+                Message = $"Ha recibido una solicitud de traslado de {owner.Email} para la mascota {pet.Name}.",
                 IsRead = false,
                 NotificationDate = DateTime.UtcNow
             };
@@ -102,7 +102,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Transfer request submitted successfully.",
+                    Message = "Solicitud de transferencia enviada correctamente.",
                     Data = null
                 });
             }
@@ -111,7 +111,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while submitting the transfer request.",
+                    Message = "Se ha producido un error en la base de datos al enviar la solicitud de transferencia.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -120,7 +120,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -139,7 +139,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Transfer request not found.",
+                    Message = "Solicitud de transferencia no encontrada.",
                     Data = null
                 });
             }
@@ -149,7 +149,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "This transfer request has already been processed.",
+                    Message = "Esta solicitud de transferencia ya ha sido tramitada.",
                     Data = null
                 });
             }
@@ -162,7 +162,7 @@ namespace APIPetrack.Controllers
                 var notification = new Notification
                 {
                     UserId = transferRequest.CurrentOwnerId,
-                    Message = $"The transfer request for {transferRequest.Pet.Name} has been accepted.",
+                    Message = $"La solicitud de transferencia de {transferRequest.Pet.Name} ha sido aceptada.",
                     IsRead = false,
                     NotificationDate = DateTime.UtcNow
                 };
@@ -175,7 +175,7 @@ namespace APIPetrack.Controllers
                 var notification = new Notification
                 {
                     UserId = transferRequest.CurrentOwnerId,
-                    Message = $"The transfer request for {transferRequest.Pet.Name} has been rejected.",
+                    Message = $"La solicitud de transferencia para {transferRequest.Pet.Name} ha sido rechazada.",
                     IsRead = false,
                     NotificationDate = DateTime.UtcNow
                 };
@@ -189,8 +189,8 @@ namespace APIPetrack.Controllers
                 {
                     Result = true,
                     Message = response.Accepted
-                        ? "Transfer request accepted."
-                        : "Transfer request rejected.",
+                        ? "Solicitud de transferencia aceptada."
+                        : "Solicitud de transferencia rechazada.",
                     Data = null
                 });
             }
@@ -199,7 +199,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while processing the transfer request.",
+                    Message = "Se ha producido un error en la base de datos al procesar la solicitud de transferencia.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -208,7 +208,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -254,7 +254,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No transfer requests found.",
+                        Message = "No se han encontrado solicitudes de transferencia.",
                         Data = null
                     });
                 }
@@ -262,7 +262,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Transfer requests retrieved successfully.",
+                    Message = "Solicitudes de transferencia recuperadas con éxito.",
                     Data = transferRequests
                 });
             }
@@ -271,7 +271,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -319,7 +319,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No transfer requests found for the specified user.",
+                        Message = "No se han encontrado solicitudes de transferencia para el usuario especificado.",
                         Data = null
                     });
                 }
@@ -327,7 +327,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Transfer requests retrieved successfully.",
+                    Message = "Solicitudes de transferencia recuperadas con éxito.",
                     Data = transferRequests
                 });
             }
@@ -336,7 +336,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }

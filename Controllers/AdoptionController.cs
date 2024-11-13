@@ -48,7 +48,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No pets available for adoption.",
+                        Message = "No hay mascotas disponibles para adopción.",
                         Data = null
                     });
                 }
@@ -56,7 +56,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Adoption pets retrieved successfully.",
+                    Message = "Mascotas en adopción recuperadas con éxito.",
                     Data = pets
                 });
             }
@@ -65,7 +65,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving adoption pets.",
+                    Message = "Se ha producido un error al recuperar las mascotas de adopción.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -80,7 +80,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid adoption request data.",
+                    Message = "Datos de solicitud de adopción no válidos.",
                     Data = null
                 });
             }
@@ -91,7 +91,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Pet not found.",
+                    Message = "Mascota no encontrada.",
                     Data = null
                 });
             }
@@ -101,7 +101,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Only pets from shelters can be adopted.",
+                    Message = "Sólo se pueden adoptar mascotas procedentes de refugios.",
                     Data = null
                 });
             }
@@ -114,7 +114,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "You have already submitted an adoption request for this pet.",
+                    Message = "Ya has enviado una solicitud de adopción para esta mascota.",
                     Data = null
                 });
             }
@@ -137,7 +137,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Adoption request submitted successfully.",
+                    Message = "Solicitud de adopción enviada correctamente.",
                     Data = null
                 });
             }
@@ -146,7 +146,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while submitting the adoption request.",
+                    Message = "Se ha producido un error en la base de datos al enviar la solicitud de adopción.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -155,7 +155,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -174,7 +174,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Adoption request not found.",
+                    Message = "Solicitud de adopción no encontrada.",
                     Data = null
                 });
             }
@@ -187,7 +187,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "There is already an accepted or delivered adoption request for this pet.",
+                    Message = "Ya hay una solicitud de adopción aceptada o entregada para esta mascota.",
                     Data = null
                 });
             }
@@ -200,7 +200,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Adoption request accepted, but not yet delivered.",
+                    Message = "Solicitud de adopción aceptada, pero aún no entregada.",
                     Data = null
                 });
             }
@@ -209,7 +209,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while accepting the adoption request.",
+                    Message = "Se ha producido un error en la base de datos al aceptar la solicitud de adopción.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -218,7 +218,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -237,7 +237,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Adoption request not found.",
+                    Message = "Solicitud de adopción no encontrada.",
                     Data = null
                 });
             }
@@ -247,7 +247,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Cannot deliver pet. The adoption request has not been accepted.",
+                    Message = "No se puede entregar la mascota. La solicitud de adopción no ha sido aceptada.",
                     Data = null
                 });
             }
@@ -271,7 +271,7 @@ namespace APIPetrack.Controllers
                     var notification = new Notification
                     {
                         UserId = request.NewOwnerId,
-                        Message = $"Your adoption request for pet {adoptionRequest.Pet.Name} has been rejected.",
+                        Message = $"Su solicitud de adopción para la mascota {adoptionRequest.Pet.Name} ha sido rechazada.",
                         IsRead = false,
                         NotificationDate = DateTime.Now
                     };
@@ -285,7 +285,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pet delivered. Other adoption requests have been rejected and notifications have been sent.",
+                    Message = "Mascota entregada. Se han rechazado otras solicitudes de adopción y se han enviado notificaciones.",
                     Data = null
                 });
             }
@@ -294,7 +294,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while confirming the delivery.",
+                    Message = "Se ha producido un error en la base de datos al confirmar la entrega.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -303,7 +303,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -322,7 +322,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Adoption request not found.",
+                    Message = "Solicitud de adopción no encontrada.",
                     Data = null
                 });
             }
@@ -332,7 +332,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Cannot reject this adoption request as it has already been delivered.",
+                    Message = "No se puede rechazar esta solicitud de adopción porque ya se ha entregado.",
                     Data = null
                 });
             }
@@ -342,7 +342,7 @@ namespace APIPetrack.Controllers
             var notification = new Notification
             {
                 UserId = adoptionRequest.NewOwnerId,
-                Message = $"Your adoption request for pet {adoptionRequest.Pet.Name} has been rejected.",
+                Message = $"Su solicitud de adopción para la mascota {adoptionRequest.Pet.Name} ha sido rechazada.",
                 IsRead = false,
                 NotificationDate = DateTime.Now
             };
@@ -354,7 +354,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Adoption request rejected and notification sent.",
+                    Message = "Solicitud de adopción rechazada y notificación enviada.",
                     Data = null
                 });
             }
@@ -363,7 +363,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while rejecting the adoption request.",
+                    Message = "Se ha producido un error en la base de datos al rechazar la solicitud de adopción.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -372,7 +372,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -390,7 +390,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Adoption request not found.",
+                    Message = "Solicitud de adopción no encontrada.",
                     Data = null
                 });
             }
@@ -400,7 +400,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Cannot cancel an adoption request that has already been delivered.",
+                    Message = "No se puede anular una solicitud de adopción que ya ha sido entregada.",
                     Data = null
                 });
             }
@@ -412,7 +412,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Adoption request has been canceled.",
+                    Message = "Se ha cancelado la solicitud de adopción.",
                     Data = null
                 });
             }
@@ -421,7 +421,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while canceling the adoption request.",
+                    Message = "Se ha producido un error en la base de datos al cancelar la solicitud de adopción.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -430,7 +430,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -475,7 +475,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Adoption requests retrieved successfully.",
+                    Message = "Solicitudes de adopción recuperadas con éxito.",
                     Data = requests
                 });
             }
@@ -484,7 +484,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving adoption requests.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -532,7 +532,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No adoption requests found for this pet.",
+                        Message = "No se han encontrado solicitudes de adopción para esta mascota.",
                         Data = null
                     });
                 }
@@ -540,7 +540,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Adoption requests for the pet retrieved successfully.",
+                    Message = "Solicitudes de adopción de la mascota recuperadas con éxito.",
                     Data = requests
                 });
             }
@@ -549,7 +549,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving adoption requests for this pet.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción de esta mascota.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -597,7 +597,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No adoption requests found for this user.",
+                        Message = "No se han encontrado solicitudes de adopción para este usuario.",
                         Data = null
                     });
                 }
@@ -605,7 +605,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Adoption requests for the user retrieved successfully.",
+                    Message = "Solicitudes de adopción para el usuario recuperadas con éxito.",
                     Data = requests
                 });
             }
@@ -614,7 +614,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving adoption requests for this user.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción de este usuario.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -663,7 +663,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No adoption requests found for this user.",
+                        Message = "No se han encontrado solicitudes de adopción para este usuario.",
                         Data = null
                     });
                 }
@@ -671,7 +671,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Adoption requests for the user retrieved successfully.",
+                    Message = "Solicitudes de adopción para el usuario recuperadas con éxito.",
                     Data = requests
                 });
             }
@@ -680,7 +680,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving adoption requests for this user.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción de este usuario.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -726,7 +726,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No adoption requests found.",
+                        Message = "No se han encontrado solicitudes de adopción.",
                         Data = null
                     });
                 }
@@ -734,7 +734,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Adoption requests retrieved successfully.",
+                    Message = "Solicitudes de adopción recuperadas con éxito.",
                     Data = pendingRequests
                 });
             }
@@ -743,7 +743,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving adoption requests.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -789,7 +789,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No accepted requests found.",
+                        Message = "No se han encontrado solicitudes aceptadas.",
                         Data = null
                     });
                 }
@@ -797,7 +797,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Accepted adoption requests retrieved successfully.",
+                    Message = "Solicitudes de adopción aceptadas recuperadas con éxito.",
                     Data = acceptedRequests
                 });
             }
@@ -806,7 +806,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving accepted adoption requests.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción aceptadas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -852,7 +852,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No cancelled requests found.",
+                        Message = "No se han encontrado solicitudes canceladas.",
                         Data = null
                     });
                 }
@@ -860,7 +860,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Cancelled adoption requests retrieved successfully.",
+                    Message = "Solicitudes de adopción canceladas recuperadas con éxito.",
                     Data = acceptedRequests
                 });
             }
@@ -869,7 +869,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving cancelled adoption requests.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción canceladas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -915,7 +915,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No rejected requests found.",
+                        Message = "No se han encontrado solicitudes rechazadas.",
                         Data = null
                     });
                 }
@@ -923,7 +923,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Rejected adoption requests retrieved successfully.",
+                    Message = "Solicitudes de adopción rechazadas recuperadas con éxito.",
                     Data = acceptedRequests
                 });
             }
@@ -932,7 +932,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving rejected adoption requests.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción rechazadas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -979,7 +979,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No adoption requests found.",
+                        Message = "No se han encontrado solicitudes de adopción entregadas.",
                         Data = null
                     });
                 }
@@ -987,7 +987,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<object>>
                 {
                     Result = true,
-                    Message = "Delivered requests retrieved successfully.",
+                    Message = "Solicitudes entregadas recuperadas con éxito.",
                     Data = pendingRequests
                 });
             }
@@ -996,7 +996,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving adoption requests.",
+                    Message = "Se ha producido un error al recuperar las solicitudes de adopción entregadas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -1010,7 +1010,7 @@ namespace APIPetrack.Controllers
 
             if (pet == null)
             {
-                throw new Exception("Pet not found.");
+                throw new Exception("Mascota no encontrada.");
             }
 
             pet.OwnerId = newOwnerId;

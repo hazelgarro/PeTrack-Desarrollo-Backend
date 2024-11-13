@@ -40,7 +40,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid model state.",
+                    Message = "Estado del modelo no válido.",
                     Data = ModelState
                 });
             }
@@ -53,7 +53,7 @@ namespace APIPetrack.Controllers
                     return Conflict(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Email already in use.",
+                        Message = "Correo electrónico ya en uso.",
                         Data = null
                     });
                 }
@@ -115,7 +115,7 @@ namespace APIPetrack.Controllers
                         return BadRequest(new ApiResponse<object>
                         {
                             Result = false,
-                            Message = "Invalid UserTypeId.",
+                            Message = "UserTypeId no válido.",
                             Data = null
                         });
                 }
@@ -124,7 +124,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Account created successfully.",
+                    Message = "Cuenta creada con éxito.",
                     Data = null
                 });
             }
@@ -133,7 +133,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while creating the account.",
+                    Message = "Se ha producido un error al crear la cuenta.",
                     Data = ex.Message
                 });
             }
@@ -179,7 +179,7 @@ namespace APIPetrack.Controllers
                             return BadRequest(new ApiResponse<object>
                             {
                                 Result = false,
-                                Message = "Invalid UserTypeId.",
+                                Message = "UserTypeId no válido.",
                                 Data = null
                             });
                     }
@@ -198,7 +198,7 @@ namespace APIPetrack.Controllers
                     return Ok(new ApiResponse<object>
                     {
                         Result = true,
-                        Message = "Login successful.",
+                        Message = "Inicio de sesión correcto.",
                         Data = result
                     });
                 }
@@ -206,7 +206,7 @@ namespace APIPetrack.Controllers
                 return Unauthorized(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid login credentials.",
+                    Message = "Credenciales de acceso no válidas.",
                     Data = null
                 });
             }
@@ -215,7 +215,7 @@ namespace APIPetrack.Controllers
                 return Unauthorized(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Login failed.",
+                    Message = "Error de inicio de sesión.",
                     Data = response
                 });
             }
@@ -231,7 +231,7 @@ namespace APIPetrack.Controllers
                 return Unauthorized(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "The user is not logged in",
+                    Message = "El usuario no ha iniciado sesión",
                     Data = null
                 });
             }
@@ -242,7 +242,7 @@ namespace APIPetrack.Controllers
                 return Unauthorized(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "User ID not found in token",
+                    Message = "ID de usuario no encontrado en el token",
                     Data = null
                 });
             }
@@ -256,7 +256,7 @@ namespace APIPetrack.Controllers
                 return Unauthorized(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "User not found",
+                    Message = "Usuario no encontrado",
                     Data = null
                 });
             }
@@ -296,7 +296,7 @@ namespace APIPetrack.Controllers
                     return BadRequest(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Invalid UserTypeId.",
+                        Message = "UserTypeId no válido.",
                         Data = null
                     });
             }
@@ -304,7 +304,7 @@ namespace APIPetrack.Controllers
             return Ok(new ApiResponse<object>
             {
                 Result = true,
-                Message = "The user is logged in",
+                Message = "El usuario ha iniciado sesión",
                 Data = result
             });
         }
@@ -318,7 +318,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid input data.",
+                    Message = "Datos de entrada no válidos.",
                     Data = ModelState
                 });
             }
@@ -332,7 +332,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "User not found.",
+                        Message = "Usuario no encontrado.",
                         Data = null
                     });
                 }
@@ -344,7 +344,7 @@ namespace APIPetrack.Controllers
                     return Unauthorized(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Incorrect current password.",
+                        Message = "Contraseña actual incorrecta.",
                         Data = null
                     });
                 }
@@ -357,7 +357,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Password updated successfully.",
+                    Message = "Contraseña actualizada correctamente.",
                     Data = null
                 });
             }
@@ -366,7 +366,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while updating the password.",
+                    Message = "Se ha producido un error al actualizar la contraseña.",
                     Data = ex.Message
                 });
             }
@@ -380,7 +380,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Email is required.",
+                    Message = "El correo electrónico es obligatorio.",
                     Data = null
                 });
             }
@@ -394,7 +394,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Please check the provided email and try again.",
+                        Message = "Por favor, compruebe el correo electrónico proporcionado e inténtelo de nuevo.",
                         Data = null
                     });
                 }
@@ -416,7 +416,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "A password reset link has been sent to your email.",
+                    Message = "Se ha enviado a tu correo electrónico un enlace para restablecer la contraseña.",
                     Data = resetUrl
                 });
             }
@@ -425,7 +425,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while requesting password reset.",
+                    Message = "Se ha producido un error al solicitar el restablecimiento de la contraseña.",
                     Data = ex.Message
                 });
             }
@@ -439,7 +439,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid input data.",
+                    Message = "Datos de entrada no válidos.",
                     Data = ModelState
                 });
             }
@@ -451,7 +451,7 @@ namespace APIPetrack.Controllers
                     return BadRequest(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Token cannot be null or empty.",
+                        Message = "El token no puede ser nulo ni estar vacío.",
                         Data = null
                     });
                 }
@@ -467,7 +467,7 @@ namespace APIPetrack.Controllers
                     return BadRequest(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Failed to decrypt token.",
+                        Message = "Error al descifrar el token.",
                         Data = null
                     });
                 }
@@ -480,7 +480,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Invalid token or token has expired.",
+                        Message = "El token no es válido o ha caducado.",
                         Data = null
                     });
                 }
@@ -495,7 +495,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Password reset successfully.",
+                    Message = "La contraseña se ha restablecido correctamente.",
                     Data = null
                 });
             }
@@ -505,7 +505,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while resetting the password.",
+                    Message = "Se ha producido un error al restablecer la contraseña.",
                     Data = ex.Message
                 });
             }
@@ -522,7 +522,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "User not found.",
+                    Message = "Usuario no encontrado.",
                     Data = null
                 });
             }
@@ -566,7 +566,7 @@ namespace APIPetrack.Controllers
                     return BadRequest(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Invalid UserTypeId.",
+                        Message = "UserTypeId no válido.",
                         Data = null
                     });
             }
@@ -574,7 +574,7 @@ namespace APIPetrack.Controllers
             return Ok(new ApiResponse<Dictionary<string, object>>
             {
                 Result = true,
-                Message = "User details retrieved successfully.",
+                Message = "Datos de usuario recuperados correctamente.",
                 Data = details
             });
         }
@@ -589,7 +589,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "No pet store shelters found.",
+                    Message = "No se han encontrado refugios de mascotas.",
                     Data = null
                 });
             }
@@ -622,7 +622,7 @@ namespace APIPetrack.Controllers
             return Ok(new ApiResponse<List<Dictionary<string, object>>>
             {
                 Result = true,
-                Message = "Pet store shelters retrieved successfully.",
+                Message = "Refugios de mascotas recuperados con éxito.",
                 Data = petStoreShelterDetailsList
             });
 
@@ -639,7 +639,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "User not found.",
+                    Message = "Usuario no encontrado.",
                     Data = null
                 });
             }
@@ -650,7 +650,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Email already in use by another user.",
+                    Message = "Correo electrónico ya utilizado por otro usuario.",
                     Data = null
                 });
             }
@@ -687,7 +687,7 @@ namespace APIPetrack.Controllers
                     return BadRequest(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Invalid UserTypeId.",
+                        Message = "UserTypeId no válido.",
                         Data = null
                     });
             }
@@ -697,7 +697,7 @@ namespace APIPetrack.Controllers
             return Ok(new ApiResponse<object>
             {
                 Result = true,
-                Message = "User and type-specific details updated successfully.",
+                Message = "Los detalles del usuario se han actualizado correctamente.",
                 Data = null
             });
         }
@@ -718,7 +718,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "User not found.",
+                        Message = "Usuario no encontrado.",
                         Data = null
                     });
                 }
@@ -738,7 +738,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "User deleted successfully.",
+                    Message = "Usuario eliminado correctamente.",
                     Data = null
                 });
             }
@@ -747,7 +747,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while deleting the user.",
+                    Message = "Se ha producido un error al eliminar el usuario.",
                     Data = new { details = ex.Message }
                 });
             }

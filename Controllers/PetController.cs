@@ -31,7 +31,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Request cannot be null.",
+                    Message = "La solicitud no puede ser nula.",
                     Data = null
                 });
             }
@@ -41,7 +41,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid request.",
+                    Message = "Solicitud no válida.",
                     Data = ModelState
                 });
             }
@@ -61,7 +61,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = $"{(request.OwnerType == "O" ? "Pet owner" : "Pet store shelter")} not found.",
+                    Message = $"{(request.OwnerType == "O" ? "Dueño de mascota" : "Refugio de animales")} no encontrado.",
                     Data = null
                 });
             }
@@ -93,7 +93,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pet registered successfully.",
+                    Message = "Mascota registrada correctamente.",
                     Data = new { petId = pet.Id, petName = pet.Name }
                 });
             }
@@ -102,7 +102,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while registering the pet.",
+                    Message = "Se ha producido un error en la base de datos al registrar la mascota.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -111,7 +111,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -146,7 +146,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No pets found.",
+                        Message = "No se han encontrado mascotas.",
                         Data = null
                     });
                 }
@@ -154,7 +154,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pets retrieved successfully.",
+                    Message = "Mascotas recuperadas con éxito.",
                     Data = pets
                 });
             }
@@ -163,7 +163,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving pets.",
+                    Message = "Se ha producido un error al recuperar mascotas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -196,7 +196,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Owner not found.",
+                        Message = "Propietario no encontrado.",
                         Data = null
                     });
                 }
@@ -226,7 +226,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No pets found for the given owner.",
+                        Message = "No se han encontrado mascotas para el propietario indicado.",
                         Data = null
                     });
                 }
@@ -234,7 +234,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pets retrieved successfully.",
+                    Message = "Mascotas recuperadas con éxito.",
                     Data = pets
                 });
             }
@@ -243,7 +243,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving pets.",
+                    Message = "Se ha producido un error al recuperar mascotas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -261,7 +261,7 @@ namespace APIPetrack.Controllers
                     return Unauthorized(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Invalid or missing user identifier.",
+                        Message = "Identificador de usuario no válido o ausente.",
                         Data = null
                     });
                 }
@@ -274,7 +274,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Owner not found.",
+                        Message = "Propietario no encontrado.",
                         Data = null
                     });
                 }
@@ -304,7 +304,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No pets found for the authenticated owner.",
+                        Message = "No se han encontrado mascotas para el propietario autentificado.",
                         Data = null
                     });
                 }
@@ -312,7 +312,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pets retrieved successfully.",
+                    Message = "Mascotas recuperadas con éxito.",
                     Data = pets
                 });
             }
@@ -321,7 +321,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving pets.",
+                    Message = "Se ha producido un error al recuperar mascotas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -339,7 +339,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Shelter not found.",
+                        Message = "Refugio no encontrado.",
                         Data = null
                     });
                 }
@@ -369,7 +369,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No pets found for this shelter.",
+                        Message = "No se han encontrado mascotas para este refugio.",
                         Data = null
                     });
                 }
@@ -377,7 +377,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pets retrieved successfully.",
+                    Message = "Mascotas recuperadas con éxito.",
                     Data = pets
                 });
             }
@@ -386,7 +386,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving pets.",
+                    Message = "Se ha producido un error al recuperar mascotas.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -402,7 +402,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Request cannot be null.",
+                    Message = "La solicitud no puede ser nula.",
                     Data = null
                 });
             }
@@ -412,7 +412,7 @@ namespace APIPetrack.Controllers
                 return BadRequest(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Invalid model state.",
+                    Message = "Estado del modelo no válido.",
                     Data = ModelState
                 });
             }
@@ -423,7 +423,7 @@ namespace APIPetrack.Controllers
                 return NotFound(new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Pet not found.",
+                    Message = "Mascota no encontrada.",
                     Data = null
                 });
             }
@@ -445,7 +445,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pet updated successfully.",
+                    Message = "Mascota actualizada correctamente.",
                     Data = new { petId = pet.Id, petName = pet.Name }
                 });
             }
@@ -454,7 +454,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while updating the pet.",
+                    Message = "Se ha producido un error en la base de datos al actualizar la mascota.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -463,7 +463,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -482,7 +482,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Pet not found.",
+                        Message = "Mascota no encontrada.",
                         Data = null
                     });
                 }
@@ -494,7 +494,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pet deleted successfully.",
+                    Message = "Mascota eliminada con éxito.",
                     Data = new { petId = petId }
                 });
             }
@@ -503,7 +503,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "Database error occurred while deleting the pet.",
+                    Message = "Se ha producido un error en la base de datos al eliminar la mascota.",
                     Data = new { details = dbEx.Message }
                 });
             }
@@ -512,7 +512,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An unexpected error occurred.",
+                    Message = "Se ha producido un error inesperado.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -548,7 +548,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Pet not found.",
+                        Message = "Mascota no encontrada.",
                         Data = null
                     });
                 }
@@ -556,7 +556,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Pet retrieved successfully.",
+                    Message = "Mascota recuperada con éxito.",
                     Data = pet
                 });
             }
@@ -565,7 +565,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving the pet.",
+                    Message = "Se ha producido un error al recuperar la mascota.",
                     Data = new { details = ex.Message }
                 });
             }

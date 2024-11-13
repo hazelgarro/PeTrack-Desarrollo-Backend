@@ -30,7 +30,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "Notification not found.",
+                        Message = "Notificación no encontrada.",
                         Data = null
                     });
                 }
@@ -43,7 +43,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
-                    Message = "Notification marked as read.",
+                    Message = "Notificación marcada como leída.",
                     Data = null
                 });
             }
@@ -52,7 +52,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while marking the notification as read.",
+                    Message = "Se ha producido un error al marcar la notificación como leída.",
                     Data = new { details = ex.Message }
                 });
             }
@@ -76,7 +76,7 @@ namespace APIPetrack.Controllers
                     return NotFound(new ApiResponse<object>
                     {
                         Result = false,
-                        Message = "No notifications found for this user.",
+                        Message = "No se han encontrado notificaciones para este usuario.",
                         Data = null
                     });
                 }
@@ -84,7 +84,7 @@ namespace APIPetrack.Controllers
                 return Ok(new ApiResponse<IEnumerable<Notification>>
                 {
                     Result = true,
-                    Message = "Notifications retrieved successfully.",
+                    Message = "Notificaciones recuperadas correctamente.",
                     Data = notifications
                 });
             }
@@ -93,7 +93,7 @@ namespace APIPetrack.Controllers
                 return StatusCode(500, new ApiResponse<object>
                 {
                     Result = false,
-                    Message = "An error occurred while retrieving notifications.",
+                    Message = "Se ha producido un error al recuperar las notificaciones.",
                     Data = new { details = ex.Message }
                 });
             }
