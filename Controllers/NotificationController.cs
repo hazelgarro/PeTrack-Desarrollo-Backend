@@ -65,11 +65,20 @@ namespace APIPetrack.Controllers
             try
             {
                 var notifications = await _context.Notification
-                .Where(n => n.UserId == userId)
-                .OrderByDescending(n => n.NotificationDate)
-                .ToListAsync();
-
-
+                    .Where(n => n.UserId == userId)
+                    .OrderByDescending(n => n.NotificationDate)
+                    .Include(n => n.Pet) 
+                    .Select(n => new NotificationWithPetInfo
+                    {
+                        Id = n.Id,
+                        UserId = n.UserId,
+                        Message = n.Message,
+                        IsRead = n.IsRead,
+                        NotificationDate = n.NotificationDate,
+                        PetId = n.Pet != null ? n.Pet.Id : (int?)null,
+                        PetPicture = n.Pet != null ? n.Pet.PetPicture : null
+                    })
+                    .ToListAsync();
 
                 if (!notifications.Any())
                 {
@@ -81,7 +90,7 @@ namespace APIPetrack.Controllers
                     });
                 }
 
-                return Ok(new ApiResponse<IEnumerable<Notification>>
+                return Ok(new ApiResponse<IEnumerable<NotificationWithPetInfo>>
                 {
                     Result = true,
                     Message = "Notificaciones recuperadas correctamente.",
@@ -98,5 +107,6 @@ namespace APIPetrack.Controllers
                 });
             }
         }
+
     }
 }

@@ -106,7 +106,8 @@ namespace APIPetrack.Controllers
                 UserId = newOwner.Id,
                 Message = $"Ha recibido una solicitud de traslado de {owner.Email} para la mascota {pet.Name}.",
                 IsRead = false,
-                NotificationDate = DateTime.UtcNow
+                NotificationDate = DateTime.UtcNow,
+                PetId = pet.Id
             };
             _context.Notification.Add(notification);
 
@@ -178,7 +179,8 @@ namespace APIPetrack.Controllers
                     UserId = transferRequest.CurrentOwnerId,
                     Message = $"La solicitud de transferencia de {transferRequest.Pet.Name} ha sido aceptada.",
                     IsRead = false,
-                    NotificationDate = DateTime.UtcNow
+                    NotificationDate = DateTime.UtcNow,
+                    PetId = transferRequest.Pet.Id
                 };
                 _context.Notification.Add(notification);
             }
@@ -191,7 +193,8 @@ namespace APIPetrack.Controllers
                     UserId = transferRequest.CurrentOwnerId,
                     Message = $"La solicitud de transferencia para {transferRequest.Pet.Name} ha sido rechazada.",
                     IsRead = false,
-                    NotificationDate = DateTime.UtcNow
+                    NotificationDate = DateTime.UtcNow,
+                    PetId = transferRequest.Pet.Id
                 };
                 _context.Notification.Add(notification);
             }

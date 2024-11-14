@@ -134,6 +134,19 @@ namespace APIPetrack.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                var notification = new Notification
+                {
+                    UserId = request.NewOwnerId,
+                    Message = $"Has enviado una solicitud de adopción para la mascota {pet.Name}.",
+                    IsRead = false,
+                    NotificationDate = DateTime.Now,
+                    PetId = request.PetId 
+                };
+
+                _context.Notification.Add(notification);
+                await _context.SaveChangesAsync();
+
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
@@ -197,6 +210,19 @@ namespace APIPetrack.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                var notification = new Notification
+                {
+                    UserId = adoptionRequest.NewOwnerId,
+                    Message = $"Tu solicitud de adopción para la mascota {adoptionRequest.Pet.Name} ha sido aceptada.",
+                    IsRead = false,
+                    NotificationDate = DateTime.Now,
+                    PetId = adoptionRequest.PetId 
+                };
+
+                _context.Notification.Add(notification);
+                await _context.SaveChangesAsync();
+
                 return Ok(new ApiResponse<object>
                 {
                     Result = true,
@@ -258,6 +284,16 @@ namespace APIPetrack.Controllers
 
             await UpdatePetOwner(adoptionRequest.PetId, adoptionRequest.NewOwnerId, adoptionRequest.OwnerType);
 
+            var deliveryNotification = new Notification
+            {
+                UserId = adoptionRequest.NewOwnerId,
+                Message = $"Felicidades, la mascota {adoptionRequest.Pet.Name} ha sido entregada exitosamente, ya puedes encontrarla en la lista de tus mascotas.",
+                IsRead = false,
+                NotificationDate = DateTime.Now,
+                PetId = adoptionRequest.Pet.Id
+            };
+            _context.Notification.Add(deliveryNotification);
+
             var otherRequests = await _context.AdoptionRequest
                 .Where(r => r.PetId == adoptionRequest.PetId && r.Id != adoptionRequestId)
                 .ToListAsync();
@@ -273,7 +309,8 @@ namespace APIPetrack.Controllers
                         UserId = request.NewOwnerId,
                         Message = $"Su solicitud de adopción para la mascota {adoptionRequest.Pet.Name} ha sido rechazada.",
                         IsRead = false,
-                        NotificationDate = DateTime.Now
+                        NotificationDate = DateTime.Now,
+                        PetId = adoptionRequest.Pet.Id
                     };
                     _context.Notification.Add(notification);
                 }
@@ -344,7 +381,8 @@ namespace APIPetrack.Controllers
                 UserId = adoptionRequest.NewOwnerId,
                 Message = $"Su solicitud de adopción para la mascota {adoptionRequest.Pet.Name} ha sido rechazada.",
                 IsRead = false,
-                NotificationDate = DateTime.Now
+                NotificationDate = DateTime.Now,
+                PetId = adoptionRequest.Pet.Id
             };
             _context.Notification.Add(notification);
 
@@ -383,6 +421,7 @@ namespace APIPetrack.Controllers
         public async Task<IActionResult> CancelAdoptionRequest(int adoptionRequestId)
         {
             var adoptionRequest = await _context.AdoptionRequest
+                .Include(r => r.Pet)
                 .FirstOrDefaultAsync(r => r.Id == adoptionRequestId);
 
             if (adoptionRequest == null)
@@ -405,6 +444,16 @@ namespace APIPetrack.Controllers
                 });
             }
             adoptionRequest.IsAccepted = "Cancelled";
+
+            var cancellationNotification = new Notification
+            {
+                UserId = adoptionRequest.NewOwnerId,
+                Message = $"Su solicitud de adopción para la mascota {adoptionRequest.Pet.Name} ha sido cancelada.",
+                IsRead = false,
+                NotificationDate = DateTime.Now,
+                PetId = adoptionRequest.Pet.Id
+            };
+            _context.Notification.Add(cancellationNotification);
 
             try
             {
