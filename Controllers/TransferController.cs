@@ -55,6 +55,20 @@ namespace APIPetrack.Controllers
                 });
             }
 
+            var existingTransferRequest = await _context.TransferRequest
+                .FirstOrDefaultAsync(tr => tr.PetId == request.PetId && tr.Status == "Pending");
+
+            if (existingTransferRequest != null)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Ya existe una solicitud de transferencia pendiente para esta mascota.",
+                    Data = null
+                });
+            }
+
+
             var owner = await _context.AppUser.FindAsync(request.CurrentOwnerId);
             if (owner == null || !BCrypt.Net.BCrypt.Verify(request.Password, owner.Password))
             {
