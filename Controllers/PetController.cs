@@ -7,6 +7,7 @@ using System.Reflection;
 using APIPetrack.Models.Pets;
 using APIPetrack.Models.Custom;
 using System.Security.Claims;
+using APIPetrack.Models.Notificacions;
 
 namespace APIPetrack.Controllers
 {
@@ -473,21 +474,65 @@ namespace APIPetrack.Controllers
         [HttpDelete("DeletePet/{petId}")]
         public async Task<IActionResult> DeletePet(int petId)
         {
+            // Buscar la mascota por ID
+            var pet = await _context.Pet.FindAsync(petId);
+            if (pet == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Mascota no encontrada.",
+                    Data = null
+                });
+            }
+
+            var transferRequests = await _context.TransferRequest
+                .Where(tr => tr.PetId == petId)
+                .ToListAsync();
+
+            var adoptions = await _context.AdoptionRequest
+                .Where(a => a.PetId == petId)
+                .ToListAsync();
+
+            if (transferRequests.Any())
+            {
+                foreach (var transferRequest in transferRequests)
+                {
+                    var notification = new Notification
+                    {
+                        UserId = transferRequest.CurrentOwnerId, 
+                        Message = $"Tu solicitud de transferencia para la mascota {pet.Name} ha sido cancelada.",
+                        IsRead = false,
+                        NotificationDate = DateTime.Now,
+                        PetId = petId
+                    };
+                    _context.Notification.Add(notification);
+
+                    transferRequest.Status = "Cancelled";  
+                }
+            }
+
+            if (adoptions.Any())
+            {
+                foreach (var adoption in adoptions)
+                {
+                    var notification = new Notification
+                    {
+                        UserId = adoption.NewOwnerId, 
+                        Message = $"Tu solicitud de adopción para la mascota {pet.Name} ha sido cancelada.",
+                        IsRead = false,
+                        NotificationDate = DateTime.Now,
+                        PetId = petId
+                    };
+                    _context.Notification.Add(notification);
+
+                    adoption.IsAccepted = "Cancelled"; 
+                }
+            }
+
             try
             {
-                // Buscar la mascota por ID
-                var pet = await _context.Pet.FindAsync(petId);
-                if (pet == null)
-                {
-                    return NotFound(new ApiResponse<object>
-                    {
-                        Result = false,
-                        Message = "Mascota no encontrada.",
-                        Data = null
-                    });
-                }
 
-                // Eliminar la mascota
                 _context.Pet.Remove(pet);
                 await _context.SaveChangesAsync();
 

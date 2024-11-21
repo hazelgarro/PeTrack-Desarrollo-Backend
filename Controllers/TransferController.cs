@@ -45,6 +45,42 @@ namespace APIPetrack.Controllers
                 });
             }
 
+            // Valida si la mascota tiene adopciones pendientes o aceptadas
+            var adoptions = await _context.AdoptionRequest
+                .Where(a => a.PetId == request.PetId && (a.IsAccepted == "Pending" || a.IsAccepted == "Accepted")) 
+                .ToListAsync();
+
+            if (adoptions.Any())
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "No se puede transferir la mascota porque tiene solicitudes de adopción pendientes o aceptadas.",
+                    Data = null
+                });
+            }
+
+            var currentOwner = await _context.AppUser.FindAsync(pet.OwnerId);
+            if (currentOwner == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Propietario actual no encontrado.",
+                    Data = null
+                });
+            }
+
+            if (request.NewOwnerEmail.Equals(currentOwner.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "El nuevo propietario no puede ser el mismo que el propietario actual.",
+                    Data = null
+                });
+            }
+
             if (pet.OwnerId != request.CurrentOwnerId)
             {
                 return BadRequest(new ApiResponse<object>
@@ -69,8 +105,8 @@ namespace APIPetrack.Controllers
             }
 
 
-            var owner = await _context.AppUser.FindAsync(request.CurrentOwnerId);
-            if (owner == null || !BCrypt.Net.BCrypt.Verify(request.Password, owner.Password))
+            //var owner = await _context.AppUser.FindAsync(request.CurrentOwnerId);
+            if (currentOwner == null || !BCrypt.Net.BCrypt.Verify(request.Password, currentOwner.Password))
             {
                 return Unauthorized(new ApiResponse<object>
                 {
@@ -104,7 +140,7 @@ namespace APIPetrack.Controllers
             var notification = new Notification
             {
                 UserId = newOwner.Id,
-                Message = $"Ha recibido una solicitud de traslado de {owner.Email} para la mascota {pet.Name}.",
+                Message = $"Ha recibido una solicitud de traslado de {currentOwner.Email} para la mascota {pet.Name}.",
                 IsRead = false,
                 NotificationDate = DateTime.UtcNow,
                 PetId = pet.Id
@@ -217,6 +253,77 @@ namespace APIPetrack.Controllers
                 {
                     Result = false,
                     Message = "Se ha producido un error en la base de datos al procesar la solicitud de transferencia.",
+                    Data = new { details = dbEx.Message }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Se ha producido un error inesperado.",
+                    Data = new { details = ex.Message }
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPut("CancelTransferRequest")]
+        public async Task<IActionResult> CancelTransferRequest(int transferRequestId)
+        {
+
+            var transferRequest = await _context.TransferRequest
+                .Include(r => r.Pet)
+                .FirstOrDefaultAsync(r => r.Id == transferRequestId);
+
+            if (transferRequest == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Solicitud de transferencia no encontrada.",
+                    Data = null
+                });
+            }
+
+            if (transferRequest.Status != "Pending")
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Solo se pueden cancelar solicitudes de transferencia pendientes.",
+                    Data = null
+                });
+            }
+
+            transferRequest.Status = "Cancelled";
+
+            var notification = new Notification
+            {
+                UserId = transferRequest.CurrentOwnerId,
+                Message = $"La solicitud de transferencia para {transferRequest.Pet.Name} ha sido cancelada.",
+                IsRead = false,
+                NotificationDate = DateTime.UtcNow,
+                PetId = transferRequest.Pet.Id
+            };
+            _context.Notification.Add(notification);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new ApiResponse<object>
+                {
+                    Result = true,
+                    Message = "Solicitud de transferencia cancelada correctamente.",
+                    Data = null
+                });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Result = false,
+                    Message = "Se ha producido un error en la base de datos al cancelar la solicitud de transferencia.",
                     Data = new { details = dbEx.Message }
                 });
             }
