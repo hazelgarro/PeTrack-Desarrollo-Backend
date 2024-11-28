@@ -726,13 +726,64 @@ namespace APIPetrack.Controllers
                 var notifications = await _context.Notification
                     .Where(n => n.UserId == id)
                     .ToListAsync();
-
                 if (notifications.Any())
                 {
                     _context.Notification.RemoveRange(notifications);
                 }
 
+                var adoptionRequestsAsNewOwner = await _context.AdoptionRequest
+                    .Where(ar => ar.NewOwnerId == id)
+                    .ToListAsync();
+                if (adoptionRequestsAsNewOwner.Any())
+                {
+                    _context.AdoptionRequest.RemoveRange(adoptionRequestsAsNewOwner);
+                }
+
+                var transferRequestsAsCurrentOwner = await _context.TransferRequest
+                    .Where(tr => tr.CurrentOwnerId == id)
+                    .ToListAsync();
+                if (transferRequestsAsCurrentOwner.Any())
+                {
+                    _context.TransferRequest.RemoveRange(transferRequestsAsCurrentOwner);
+                }
+
+                var pets = await _context.Pet
+                    .Where(p => p.OwnerId == id)
+                    .ToListAsync();
+
+                if (pets.Any())
+                {
+                    var petIds = pets.Select(p => p.Id).ToList();
+
+                    var adoptionRequestsForPets = await _context.AdoptionRequest
+                        .Where(ar => petIds.Contains(ar.PetId))
+                        .ToListAsync();
+                    if (adoptionRequestsForPets.Any())
+                    {
+                        _context.AdoptionRequest.RemoveRange(adoptionRequestsForPets);
+                    }
+
+                    var transferRequests = await _context.TransferRequest
+                        .Where(tr => petIds.Contains(tr.PetId))
+                        .ToListAsync();
+                    if (transferRequests.Any())
+                    {
+                        _context.TransferRequest.RemoveRange(transferRequests);
+                    }
+
+                    _context.Pet.RemoveRange(pets);
+                }
+
+                var adoptionRequests = await _context.AdoptionRequest
+                    .Where(ar => ar.CurrentOwnerId == id)
+                    .ToListAsync();
+                if (adoptionRequests.Any())
+                {
+                    _context.AdoptionRequest.RemoveRange(adoptionRequests);
+                }
+
                 _context.AppUser.Remove(user);
+
                 await _context.SaveChangesAsync();
 
                 return Ok(new ApiResponse<object>
@@ -752,6 +803,8 @@ namespace APIPetrack.Controllers
                 });
             }
         }
+
+
 
 
         [HttpGet("SearchUser")]
